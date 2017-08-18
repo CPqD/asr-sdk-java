@@ -15,7 +15,7 @@
 	<modules>
 		<module>recognizer-protocol</module>
 		<module>recognizer</module>
-		<module>recognizer-samples</module>
+		<module>recognizer-examples</module>
 	</modules>
 
 	<properties>

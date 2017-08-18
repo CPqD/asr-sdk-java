@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package br.com.cpqd.asr.recognizer.sample;
+package br.com.cpqd.asr.recognizer.example;
 
 import java.io.File;
 import java.io.IOException;

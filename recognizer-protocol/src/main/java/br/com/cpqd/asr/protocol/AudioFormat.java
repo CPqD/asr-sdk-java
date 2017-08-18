@@ -16,7 +16,7 @@
 package br.com.cpqd.asr.protocol;
 
 /**
- * Representa o formato de audio.
+ * Represents the input audio format.
  * 
  */
 public class AudioFormat {
@@ -25,16 +25,16 @@ public class AudioFormat {
 		ALAW, PCM_FLOAT, PCM_SIGNED, PCM_UNSIGNED, ULAW
 	};
 
-	/** Número de canais. */
+	/** Number of channels present in the audio stream. */
 	private int channels;
 	
-	/** Formato da codificação. */
+	/** Audio encoding format. */
 	private Encoding encoding;
 	
-	/** Taxa de amostragem. */
+	/** Audio sample rate. */
 	private float sampleRate;
 	
-	/** Número de bits de uma amostra. */
+	/** The audio sample size in bits. */
 	private int sampleSizeInBits;
 
 	public AudioFormat() {

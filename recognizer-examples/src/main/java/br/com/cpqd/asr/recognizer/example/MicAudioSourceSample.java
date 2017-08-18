@@ -13,20 +13,22 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package br.com.cpqd.asr.recognizer.sample;
+package br.com.cpqd.asr.recognizer.example;
 
-import java.io.FileInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.LineUnavailableException;
 import javax.websocket.DeploymentException;
 
-import br.com.cpqd.asr.recognizer.BufferAudioSource;
 import br.com.cpqd.asr.recognizer.LanguageModelList;
+import br.com.cpqd.asr.recognizer.MicAudioSource;
 import br.com.cpqd.asr.recognizer.RecognitionException;
 import br.com.cpqd.asr.recognizer.RecognitionListener;
 import br.com.cpqd.asr.recognizer.SpeechRecognizer;
-import br.com.cpqd.asr.recognizer.model.Interpretation;
 import br.com.cpqd.asr.recognizer.model.PartialRecognitionResult;
 import br.com.cpqd.asr.recognizer.model.RecognitionAlternative;
 import br.com.cpqd.asr.recognizer.model.RecognitionConfig;
@@ -35,78 +37,61 @@ import br.com.cpqd.asr.recognizer.model.RecognitionResult;
 
 /**
  * Exemplo de uso do cliente Java SE do servidor de reconhecimento de fala,
- * utilizando uma entrada de áudio do tipo BufferAudioSource. Essa classe
- * permite que uma aplicação escreva sequências de bytes sem bloquear a thread
- * principal. Os bytes escritos serão enviados para o serviço de reconhecimento
- * através de uma thread secundária.
- * 
+ * utilizando uma entrada de áudio do tipo MicAudioSource, que captura áudio do
+ * microfone do sistema. A captura é iniciada quando a tecla <ENTER> for
+ * pressionada. A captura é finalizada ao pressionar novamente o <ENTER>.
+ *
  */
-public class BufferAudioSourceSample {
+public class MicAudioSourceSample {
 
-	public static void main(String[] args)
-			throws DeploymentException, IOException, URISyntaxException, RecognitionException, InterruptedException {
+	public static void main(String[] args) throws DeploymentException, IOException, URISyntaxException,
+			RecognitionException, LineUnavailableException {
 
-		if (!(args.length == 3 || args.length == 5)) {
-			System.out.println("Usage: <ws_url> <lang_uri> <wav_path> [ <user> <password> ]");
-			System.out.println("   eg: ws://127.0.0.1:8025/asr-server/asr builtin:grammar/samples/phone /path/to/audio.wav");
-			System.out.println("  eg2: wss://contact/cpqd/and/request/a/key/ builtin:slm/general /path/to/audio.wav myusername mypassword");
+		if (!(args.length == 2 || args.length == 4)) {
+			System.out.println("Usage: <ws_url> <lang_uri> [ <user> <password> ]");
+			System.out.println("   eg: ws://127.0.0.1:8025/asr-server/asr builtin:grammar/samples/phone");
+			System.out.println("  eg2: wss://contact/cpqd/and/request/a/key/ builtin:slm/general myusername mypassword");
 			return;
 		} else {
 			System.out.println("Running with:");
 			System.out.println("         url: " + args[0]);
 			System.out.println("       lmURI: " + args[1]);
-			System.out.println("       audio: " + args[2]);
 		}
 
 		String url = args[0];
 		String lmURI = args[1];
-		String audioFile = args[2];
-		String user = args[3];
-		String pwd = args[4];
+		String user = args[2];
+		String pwd = args[3];
 
 		SpeechRecognizer recognizer = getSpeechRecognizer(url, user, pwd);
 
-		// modelo de linguagem (conforme instalado no ambiente do servidor)
+		// modelo de linguagem de fala livre
 		LanguageModelList lmList = LanguageModelList.builder().addFromURI(lmURI).build();
+
+		// leitor da entrada do teclado para controlar o inicio e fim da captura do
+		// microfone
+		BufferedReader keyboardReader = new BufferedReader(new InputStreamReader(System.in));
 
 		// realiza um reconhecimento
 		try {
-			// cria um objeto BufferAudioSource para receber os bytes de audio
-			BufferAudioSource audio = new BufferAudioSource();
+			// cria um objeto MicAudioSource para capturar audio do microfone do sistema
+			MicAudioSource audioSource = new MicAudioSource(new AudioFormat(8000F, 16, 1, true, false));
 
-			// inicia o reconhecimento (servidor fica aguardando envio de audio)
-			recognizer.recognize(audio, lmList);
+			System.out.println("Press <ENTER> to start, and again to stop recording...");
+			keyboardReader.readLine();
+			recognizer.recognize(audioSource, lmList);
+			System.err.println("line started");
+			keyboardReader.readLine();
+			audioSource.finish();
+			System.err.println("line stopped");
 
-			// utiliza um arquivo como fonte de bytes de áudio
-			FileInputStream input = new FileInputStream(audioFile);
-
-			// faz a leitura do arquivo e escreve no AudioSource
-			byte[] buffer = new byte[1600]; // segmento de 100 ms (tx 8kHz)
-			int len;
-			boolean keepWriting = true;
-			while ((len = input.read(buffer)) != -1 && keepWriting) {
-				keepWriting = audio.write(buffer, len);
-				// audioSource.flush();
-				// atrasa o envio do proximo segmento para simular uma captura de audio em tempo
-				// real.
-				Thread.sleep(100);
-			}
-			// fecha o arquivo de audio e finaliza o AudioSource
-			input.close();
-			audio.finish();
-
-			// aguarda o resultado do reconhecimento
 			RecognitionResult result = recognizer.waitRecognitionResult().get(0);
+
 			int i = 0;
 			for (RecognitionAlternative alt : result.getAlternatives()) {
 				System.out.println(
 						String.format("Alternative [%s] (score = %s): %s", i++, alt.getConfidence(), alt.getText()));
-				for (Interpretation interpretation : alt.getInterpretations()) {
-					int j = 0;
-					System.out.println(String.format("\t Interpretation [%s]: %s", j++, interpretation));
-				}
 			}
-
 		} catch (RecognitionException e) {
 			System.err.println("Generic error: " + e.toString());
 		} finally {

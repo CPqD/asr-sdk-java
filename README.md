@@ -6,8 +6,7 @@ CPqD ASR Recognizer
 Para maiores informações, consulte [a documentação do projeto](https://speech-doc.cpqd.com.br/asr).
 
 ### Códigos de Exemplo
-
-Consulte [Recognizer Samples](https://github.com/CPqD/asr-sdk-java/recognizer/recognizer-samples)
+Os códigos de exemplo estão sob o diretório [Recognizer Examples](https://github.com/CPqD/asr-sdk-java/tree/master/recognizer-examples)
 
 ### Construindo a partir do código-fonte
 

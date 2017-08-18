@@ -35,7 +35,7 @@ import br.com.cpqd.asr.protocol.AsrMessage;
 import br.com.cpqd.asr.protocol.AsrMessage.AsrMessageType;
 
 /**
- * Encoder do protocolo ASR, que utiliza fluxo binário de dados.
+ * ASR Server WebSocket Messages Encoder.
  * 
  */
 public class AsrProtocolEncoder implements Encoder.BinaryStream<AsrMessage>, Decoder.BinaryStream<AsrMessage> {
@@ -187,13 +187,13 @@ public class AsrProtocolEncoder implements Encoder.BinaryStream<AsrMessage>, Dec
 	}
 
 	/**
-	 * Le os dados de um InputStream e armazena em um array de bytes.
+	 * Read bytes from an InputStream to a byte array.
 	 * 
 	 * @param is
-	 *            fluxo de bytes de entrada do websocket.
-	 * @return array de bytes lidos.
+	 *            data inputstream from the WebSocket channel.
+	 * @return the bytes read from the input stream.
 	 * @throws IOException
-	 *             em caso de erro de I/O.
+	 *             in case any I/O error occurs.
 	 */
 	public static byte[] getBytesFromInputStream(InputStream is) throws IOException {
 		try (ByteArrayOutputStream os = new ByteArrayOutputStream();) {
@@ -211,16 +211,17 @@ public class AsrProtocolEncoder implements Encoder.BinaryStream<AsrMessage>, Dec
 	}
 
 	/**
-	 * Le os dados de um array de bytes, a partir de uma posição indicada, até
-	 * encontrar a sequencia CRLF ou LF. O conteúdo lido é copiado em uma String.
+	 * Read a line of the ASR message from a byte array. Each byte is read until a
+	 * CRLF or LF sequence is found. The data is copied to the StringBuffer
+	 * reference.
 	 * 
 	 * @param buf
-	 *            array de bytes
+	 *            input byte array.
 	 * @param start
-	 *            posicao inicial
+	 *            initial read position.
 	 * @param line
-	 *            conteúdo lido até o CRLF ou LF
-	 * @return posição do ultimo caractere lido, ou -1 caso atinja o fim do array
+	 *            the protocol line, which is data read until a CRLF or LF is found.
+	 * @return last byte read position, or -1 if the end of the array is reached.
 	 */
 	private static int readLine(byte[] buf, int start, StringBuffer line) {
 		if (0 <= start && start < buf.length - 1) {
@@ -241,6 +242,12 @@ public class AsrProtocolEncoder implements Encoder.BinaryStream<AsrMessage>, Dec
 		return -1;
 	}
 
+	/**
+	 * Utility method for printing the message in the log file.
+	 * 
+	 * @param buf
+	 *            the byte array from WebSocket input stream.
+	 */
 	private static void logMessage(byte[] buf) {
 		if (logger.isDebugEnabled()) {
 

@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Classe base para a construção de mensagens da API do servidor ASR.
+ * The ASR Protocol Message base class.
  * 
  */
 public abstract class AsrMessage {
@@ -50,19 +50,19 @@ public abstract class AsrMessage {
 
 	};
 
-	/** Tipo da mensagem. */
+	/** Defines the message type. */
 	private AsrMessageType mType;
 
-	/** Número de identificação da sessão. */
+	/** The ASR session identification number. */
 	private long handle;
 
-	/** Conteúdo do corpo da mensagem. */
+	/** Message body content. */
 	private byte[] content;
 
-	/** Quantidade de bytes do corpo. */
+	/** The body length in bytes. */
 	private int contentLength;
 
-	/** Tipo do conteúdo (Mime-Type). */
+	/** The message body content-type. */
 	private String contentType;
 
 	public AsrMessageType getmType() {

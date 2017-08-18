@@ -30,24 +30,24 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 /**
- * Representa uma sentença gerada pelo reconhecimento.
+ * Represents a sentence recognized.
  * 
  */
 public class Sentence {
-	/** indice da sentença. */
+	/** Sentence index. */
 	private int index;
 
-	/** texto reconhecido. */
+	/** Recognized text. */
 	private String text;
 
-	/** indice de confiança. */
+	/** Confidence score. */
 	private int score;
 
-	/** interpretações (em formato JSON). */
+	/** The sentence interpretation list in JSON format. */
 	@JsonIgnore
 	private List<String> jsonInterpretations = new ArrayList<>();
 
-	/** lista de interpretacoes. */
+	/** The sentence interpretation list. */
 	@JacksonXmlElementWrapper(localName = "interpretations")
 	@JacksonXmlProperty(localName = "interpretation")
 	@JsonInclude(Include.NON_EMPTY)
@@ -125,10 +125,6 @@ public class Sentence {
 		return result;
 	}
 
-	/**
-	 * Comparacao leva apenas em consideracao o texto e o resultado de
-	 * interpretacao.
-	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

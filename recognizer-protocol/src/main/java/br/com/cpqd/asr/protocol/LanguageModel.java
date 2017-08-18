@@ -22,24 +22,24 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 /**
- * Representa uma modelo de língua.
+ * Represents a Language Model.
  * 
  */
 public class LanguageModel {
 
-	/** Caminho para arquivo do modelo no servidor. */
+	/** URI for the LM file location. */
 	@JsonInclude(Include.NON_EMPTY)
 	private String[] uri;
 
-	/** Definição do modelo, em formado XML ou BNF. */
+	/** LM definition, in XML or BNF format. */
 	@JsonInclude(Include.NON_EMPTY)
 	private String definition;
 
-	/** Indica o formato da definição. */
+	/** The LM definition format type. */
 	@JsonIgnore
 	private String contentType;
 
-	/** Identificação do modelo. */
+	/** The LM identification string. */
 	@JsonInclude(Include.NON_EMPTY)
 	private String id;
 

@@ -20,5 +20,5 @@ Execute o comando abaixo para compilar e empacotar os exemplos:
 
 Para executar o exemplo `RecognizeSample` utilize o comando abaixo.
 
-        java -cp target/recognizer-samples-1.0.0-SNAPSHOT.jar br.com.cpqd.asr.recognizer.sample.RecognizeSample <URL> <lmURI> <path-to-audio> [<user> <passwd>] 
+        java -cp target/recognizer-examples-1.0.0-SNAPSHOT.jar br.com.cpqd.asr.recognizer.example.RecognizeSample <URL> <lmURI> <path-to-audio> [<user> <passwd>] 
 

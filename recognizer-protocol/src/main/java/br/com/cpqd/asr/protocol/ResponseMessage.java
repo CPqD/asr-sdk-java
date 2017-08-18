@@ -21,7 +21,7 @@ import java.util.LinkedHashMap;
 import br.com.cpqd.asr.protocol.RecognitionParameters.Header;
 
 /**
- * Mensagem de resposta a uma operação previamente enviada.
+ * Response message returned by the server.
  * 
  */
 public class ResponseMessage extends AsrMessage {
@@ -34,22 +34,22 @@ public class ResponseMessage extends AsrMessage {
 		INVALID_MESSAGE // mensagem mal formatada
 	};
 
-	/** código de erro em caso de falha. */
+	/** The error code in case of server errors. */
 	private String errorCode;
 
-	/** status da sessão de reconhecimento. */
+	/** The recognition session status. */
 	private SessionStatus sessionStatus;
 
-	/** representa o resultado da operação. */
+	/** The operation result. */
 	private Result result;
 
-	/** mensagem opcional. */
+	/** An optional message content. */
 	private String message;
 
-	/** Tempo de expiração da sessão. */
+	/** Session timeout indication. */
 	private String expires;
 
-	/** headers adicionais para parametros de sessão. */
+	/** Session parameters headers. */
 	private HashMap<String, String> parameters = new LinkedHashMap<String, String>();
 
 	private AsrMessageType method;
@@ -85,10 +85,10 @@ public class ResponseMessage extends AsrMessage {
 	}
 
 	/**
-	 * Adiciona lista de headers.
+	 * Adds a list of message headers.
 	 * 
 	 * @param headers
-	 *            mapa de atributos para definir os headers da mensagem.
+	 *            the headers attribute map.
 	 */
 	public void putRecognitionParameters(HashMap<String, String> headers) {
 		parameters.putAll(headers);
@@ -216,9 +216,9 @@ public class ResponseMessage extends AsrMessage {
 	}
 
 	/**
-	 * Retorna uma mensagem formatada com o código de erro e a mensagem de erro.
+	 * Returns a formatted error message containing the error code and message.
 	 * 
-	 * @return formato 'ERROR_CODE - ERROR_MESSAGE'
+	 * @return error message format: 'ERROR_CODE - ERROR_MESSAGE'.
 	 */
 	public String getErrorMessage() {
 		if (errorCode != null) {
