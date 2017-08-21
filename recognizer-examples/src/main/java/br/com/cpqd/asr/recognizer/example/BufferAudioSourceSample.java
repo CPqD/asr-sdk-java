@@ -61,8 +61,14 @@ public class BufferAudioSourceSample {
 		String url = args[0];
 		String lmURI = args[1];
 		String audioFile = args[2];
-		String user = args[3];
-		String pwd = args[4];
+		String user = null;
+		String pwd = null;
+		try {
+			user = args[3];
+			pwd = args[4];
+		} catch (Exception e) {
+			// credentials not defined
+		}
 
 		SpeechRecognizer recognizer = getSpeechRecognizer(url, user, pwd);
 

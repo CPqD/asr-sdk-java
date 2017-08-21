@@ -25,7 +25,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreType;
 
 /**
- * Relaciona os parâmetros de configuração da sessão de reconhecimento de fala.
+ * Contains the recognition parameters definition.
  * 
  */
 public class RecognitionParameters {
@@ -34,25 +34,25 @@ public class RecognitionParameters {
 	private static Logger logger = LoggerFactory.getLogger(RecognitionParameters.class.getName());
 
 	/**
-	 * Enumeração dos atributos da classe SessionParameter, associados ao header
-	 * utilizado na comunicação WebSocket.
+	 * The recognition parameter header enumeration.
 	 * 
 	 */
 	@JsonIgnoreType
 	public enum Header {
 
-		noInputTimeoutEnabled("noInputTimeout.enabled"), noInputTimeout(
-				"noInputTimeout.value"), recognitionTimeoutEnabled("recognitionTimeout.enabled"), recognitionTimeout(
-						"recognitionTimeout.value"), decoderStartInputTimers(
-								"decoder.startInputTimers"), decoderMaxSentences(
-										"decoder.maxSentences"), endpointerHeadMargin(
-												"endpointer.headMargin"), endpointerTailMargin(
-														"endpointer.tailMargin"), endpointerWaitEnd(
-																"endpointer.waitEnd"), endpointerLevelThreshold(
-																		"endpointer.levelThreshold"), endpointerLevelMode(
-																				"endpointer.levelMode"), endpointerAutoLevelLen(
-																						"endpointer.autoLevelLen"), decoderConfidenceThreshold(
-																								"decoder.confidenceThreshold");
+		noInputTimeoutEnabled("noInputTimeout.enabled"), 
+		noInputTimeout("noInputTimeout.value"), 
+		recognitionTimeoutEnabled("recognitionTimeout.enabled"), 
+		recognitionTimeout("recognitionTimeout.value"), 
+		decoderStartInputTimers("decoder.startInputTimers"), 
+		decoderMaxSentences("decoder.maxSentences"), 
+		endpointerHeadMargin("endpointer.headMargin"), 
+		endpointerTailMargin("endpointer.tailMargin"), 
+		endpointerWaitEnd("endpointer.waitEnd"), 
+		endpointerLevelThreshold("endpointer.levelThreshold"), 
+		endpointerLevelMode("endpointer.levelMode"), 
+		endpointerAutoLevelLen("endpointer.autoLevelLen"), 
+		decoderConfidenceThreshold("decoder.confidenceThreshold");
 
 		/** valor do header na comunicação websocket. */
 		private String header;

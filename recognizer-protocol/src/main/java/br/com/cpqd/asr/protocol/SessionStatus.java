@@ -16,8 +16,7 @@
 package br.com.cpqd.asr.protocol;
 
 /**
- * Representam os estados da sessão de reconhecimento de fala. A sequencia
- * desses estados deve coincidir com a classe SessionState da API do ASR.
+ * Represent the session status.
  * 
  */
 public enum SessionStatus {

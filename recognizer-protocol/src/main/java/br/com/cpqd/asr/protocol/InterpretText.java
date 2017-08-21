@@ -24,18 +24,18 @@ import javax.websocket.DecodeException;
 import br.com.cpqd.asr.exception.UnsupportedDataException;
 
 /**
- * Mensagem para executar uma interpretação de texto.
+ * This message sends a text phrase to be interpreted by a grammar.
  *
  */
 public class InterpretText extends AsrMessage {
 
-	/** Modelo de Linguagem. */
+	/** The Language Model. */
 	private LanguageModel lm;
 
-	/** Texto para interpretação. */
+	/** Text content for interpretation. */
 	private String text;
 
-	/** Define o tipo de conteúdo do resultado do reconhecimento. */
+	/** Defines the response format (content-type) of the interpretation result.  */
 	private String accept;
 
 	public InterpretText() {

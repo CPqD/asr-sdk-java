@@ -22,14 +22,13 @@ import javax.websocket.DecodeException;
 import br.com.cpqd.asr.exception.UnsupportedDataException;
 
 /**
- * Contém as informações do áudio para o reconhecimento de fala. O
- * reconhecimento pode ser realizado sobre um buffer de áudio enviado ou por um
- * arquivo armazenado localmente no servidor.
+ * Message used to transfer an audio packet to the speech recognition process in
+ * the server.
  *
  */
 public class SendAudio extends AsrMessage {
 
-	/** indicador de ultimo pacote. */
+	/** Last packet indicator. */
 	private boolean lastPacket;
 
 	public SendAudio() {

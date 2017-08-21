@@ -18,7 +18,7 @@ package br.com.cpqd.asr.protocol;
 import java.util.HashMap;
 
 /**
- * Mensagem que inicia o temporizador de início de envio de áudio, da engine ASR.
+ * This message starts the timers configured in the server.
  * 
  */
 public class StartInputTimersMessage extends AsrMessage {

@@ -30,7 +30,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 /**
- * Mensagem de resultado do reconhecimento.
+ * This message contains the recognition result. 
  * 
  */
 public class RecognitionResultMessage extends AsrMessage {

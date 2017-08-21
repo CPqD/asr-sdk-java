@@ -18,7 +18,7 @@ package br.com.cpqd.asr.protocol;
 import java.util.HashMap;
 
 /**
- * Mensagem utilizada para encerrar o reconhecimento dentro de uma sessão.
+ * This message is used to cancel an active recognition process in the server.
  * 
  */
 public class CancelRecognition extends AsrMessage {

@@ -16,7 +16,7 @@
 package br.com.cpqd.asr.protocol;
 
 /**
- * Resultado do reconhecimento. Deve possuir os mesmos valores da classe RecognitionStatus da API do ASR.
+ * The recognition result status enumeration.
  * 
  */
 public enum RecognitionStatus {

@@ -30,7 +30,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 /**
- * Represents a sentence recognized.
+ * Represents a recognized sentence.
  * 
  */
 public class Sentence {

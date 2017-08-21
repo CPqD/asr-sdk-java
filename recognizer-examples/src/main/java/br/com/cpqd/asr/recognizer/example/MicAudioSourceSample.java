@@ -60,8 +60,14 @@ public class MicAudioSourceSample {
 
 		String url = args[0];
 		String lmURI = args[1];
-		String user = args[2];
-		String pwd = args[3];
+		String user = null;
+		String pwd = null;
+		try {
+			user = args[3];
+			pwd = args[4];
+		} catch (Exception e) {
+			// credentials not defined
+		}
 
 		SpeechRecognizer recognizer = getSpeechRecognizer(url, user, pwd);
 

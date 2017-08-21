@@ -18,13 +18,12 @@ package br.com.cpqd.asr.protocol;
 import java.util.HashMap;
 
 /**
- * Mensagem gerada pelo servidor, após o recebimento de uma amostra de áudio,
- * caso o servidor detecte fim de fala no áudio.
+ * This message indicates that the server detected the end of speech in the
+ * audio buffer, during a speech recognition.
  * 
  */
 public class EndOfSpeechMessage extends AsrMessage {
 
-	/** Status da sessão de reconhecimento. */
 	private SessionStatus sessionStatus;
 
 	public EndOfSpeechMessage() {

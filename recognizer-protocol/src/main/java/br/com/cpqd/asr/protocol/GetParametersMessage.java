@@ -21,12 +21,12 @@ import java.util.LinkedHashMap;
 import br.com.cpqd.asr.protocol.RecognitionParameters.Header;
 
 /**
- * Mensagem utilizada para obter os parametros de uma sessão de reconhecimento.
+ * This message is used to retrieve the session parameters configured in the server.
  * 
  */
 public class GetParametersMessage extends AsrMessage {
 
-	/** Headers para parametros de sessão. */
+	/** Recognition parameters. */
 	private HashMap<String, String> parameters = new LinkedHashMap<String, String>();
 
 	public GetParametersMessage() {

@@ -26,13 +26,11 @@ import javax.websocket.DecodeException;
 import br.com.cpqd.asr.exception.UnsupportedDataException;
 
 /**
- * Mensagem utilizada para iniciar e configurar o reconhecimento dentro de uma
- * sessão.
+ * This message defines a new grammar to be used in the recognition session.
  * 
  */
 public class DefineGrammarMessage extends AsrMessage {
 
-	/** Modelo de Linguagem. */
 	private LanguageModel lm;
 
 	public DefineGrammarMessage() {

@@ -28,18 +28,20 @@ import br.com.cpqd.asr.exception.UnsupportedDataException;
 import br.com.cpqd.asr.protocol.RecognitionParameters.Header;
 
 /**
- * Mensagem utilizada para iniciar e configurar o reconhecimento dentro de uma
- * sessão.
+ * This message starts the speech recognition process.
  * 
  */
 public class StartRecognition extends AsrMessage {
-	/** Modelo de Linguagem. */
+	/** The Language Model. */
 	private LanguageModel lm;
 
-	/** Define o tipo de conteúdo do resultado do reconhecimento. */
+	/**
+	 * Defines the format (content type) of the response message containing the
+	 * recognition result message.
+	 */
 	private String accept;
 
-	/** headers adicionais para parametros de sessão. */
+	/** Additional headers containing the recognition parameters. */
 	private HashMap<String, String> parameters = new LinkedHashMap<String, String>();
 
 	public StartRecognition() {
@@ -74,10 +76,10 @@ public class StartRecognition extends AsrMessage {
 	}
 
 	/**
-	 * Define o mapa com os parametros de reconhecimento.
+	 * Sets the recognition parameters.
 	 * 
 	 * @param parameters
-	 *            mapa com os parâmetros.
+	 *            header map.
 	 */
 	public void setRecognitionParameters(HashMap<String, String> parameters) {
 		this.parameters = parameters;

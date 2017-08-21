@@ -19,13 +19,13 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 /**
- * Mensagem gerada pelo servidor, após o recebimento de uma amostra de áudio,
- * caso o servidor detecte início de fala no áudio.
+ * This message indicates that the server detected the start of speech in the
+ * audio buffer, during a speech recognition.
  * 
  */
 public class StartOfSpeechMessage extends AsrMessage {
 	
-	/** status da sessão de reconhecimento. */
+	/** Recognition session status. */
 	private SessionStatus sessionStatus;
 
 	public StartOfSpeechMessage() {

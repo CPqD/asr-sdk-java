@@ -24,7 +24,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 /**
- * Representa o resultado do reconhecimento.
+ * Represents the recognition result. 
  * 
  */
 @JacksonXmlRootElement(localName = "recognition_result")

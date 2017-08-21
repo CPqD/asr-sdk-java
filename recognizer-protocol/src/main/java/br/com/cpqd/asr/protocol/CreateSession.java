@@ -18,12 +18,12 @@ package br.com.cpqd.asr.protocol;
 import java.util.HashMap;
 
 /**
- * Mensagem utilizada para criar uma nova sessão de reconhecimento.
+ * This message creates a new recognition session in the server.
  * 
  */
 public class CreateSession extends AsrMessage {
 
-	/** Identificação do agente/cliente que enviou a mensagem. */
+	/** Client user agent identification (optional). */
 	private String userAgent;
 
 	public CreateSession() {

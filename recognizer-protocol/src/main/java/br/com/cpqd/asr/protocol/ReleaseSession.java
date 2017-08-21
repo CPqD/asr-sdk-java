@@ -18,7 +18,7 @@ package br.com.cpqd.asr.protocol;
 import java.util.HashMap;
 
 /**
- * Libera e encerra uma sessão de reconhecimento.
+ * This message releases and closes the recognition session in the server.
  * 
  */
 public class ReleaseSession extends AsrMessage {
