@@ -633,7 +633,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 						length += read;
 						sendAudio(buffer, read, false);
 					} else if (read < 0) {
-						sendAudio(new byte[] { 0 }, 0, true);
+						sendAudio(new byte[] {}, 0, true);
 					}
 
 					Thread.sleep(DELAY);
