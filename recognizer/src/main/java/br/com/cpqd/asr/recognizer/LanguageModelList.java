@@ -117,25 +117,14 @@ public class LanguageModelList {
 		/**
 		 * Adds a new grammar content.
 		 * 
-		 * @param body
-		 *            the grammar body content.
-		 * @return the builder object.
-		 */
-		public LanguageModelList.Builder addInlineGrammar(String body) {
-			return addInlineGrammar(null, body);
-		}
-
-		/**
-		 * Adds a new grammar content.
-		 * 
-		 * @param grammarId
+		 * @param id
 		 *            the grammar identification.
 		 * @param body
 		 *            the grammar body content.
 		 * @return the builder object.
 		 */
-		public LanguageModelList.Builder addInlineGrammar(String grammarId, String body) {
-			this.grammarList.add(new String[] { grammarId, body });
+		public LanguageModelList.Builder addInlineGrammar(String id, String body) {
+			this.grammarList.add(new String[] { id, body });
 			return this;
 		}
 
