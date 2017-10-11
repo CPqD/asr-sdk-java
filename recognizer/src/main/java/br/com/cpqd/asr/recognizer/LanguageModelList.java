@@ -86,8 +86,8 @@ public class LanguageModelList {
 	 *
 	 */
 	public static class Builder {
-		private List<String> uriList = new ArrayList<>();
-		private List<String[]> grammarList = new ArrayList<>();
+		private List<String> uriList = new ArrayList<>(1);
+		private List<String[]> grammarList = new ArrayList<>(1);
 		private List<String> phraseRuleList = new ArrayList<>();
 		private Integer timeToLive;
 		private Integer timeToIdle;
@@ -110,6 +110,7 @@ public class LanguageModelList {
 		 * @return the builder object.
 		 */
 		public LanguageModelList.Builder addFromURI(String uri) {
+			if (this.grammarList.size() > 0) throw new IndexOutOfBoundsException("Only one URI is supported.");
 			this.uriList.add(uri);
 			return this;
 		}
@@ -124,6 +125,7 @@ public class LanguageModelList {
 		 * @return the builder object.
 		 */
 		public LanguageModelList.Builder addInlineGrammar(String id, String body) {
+			if (this.grammarList.size() > 0) throw new IndexOutOfBoundsException("Only one grammar is supported.");
 			this.grammarList.add(new String[] { id, body });
 			return this;
 		}
