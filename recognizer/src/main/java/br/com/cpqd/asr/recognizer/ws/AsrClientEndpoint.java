@@ -89,8 +89,6 @@ public class AsrClientEndpoint {
 
 	private Session session;
 
-	private String[] credentials;
-
 	private List<RecognitionListener> listeners = new ArrayList<>();
 
 	private SessionStatus status;
@@ -110,7 +108,7 @@ public class AsrClientEndpoint {
 	 *             invalid server URL (e.g:
 	 *             'ws://127.0.0.1:8025/asr-server/asr').
 	 */
-	public AsrClientEndpoint(String url) throws URISyntaxException {
+	public AsrClientEndpoint(String url, String[] credentials) throws URISyntaxException {
 		clientManager = ClientManager.createClient();
 
 		clientManager.getProperties().put(GrizzlyClientProperties.SELECTOR_THREAD_POOL_CONFIG,
@@ -430,14 +428,6 @@ public class AsrClientEndpoint {
 	 */
 	public SessionStatus getStatus() {
 		return status;
-	}
-
-	/**
-	 * @param credentials
-	 *            the credentials to set
-	 */
-	public void setCredentials(String[] credentials) {
-		this.credentials = credentials;
 	}
 
 	/**

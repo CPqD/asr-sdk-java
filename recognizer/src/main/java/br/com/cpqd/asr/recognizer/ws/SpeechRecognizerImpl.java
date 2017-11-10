@@ -103,10 +103,9 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 		this.builder = builder;
 		this.status = RecognizerStatus.IDLE;
 
-		client = new AsrClientEndpoint(builder.url);
+		client = new AsrClientEndpoint(builder.url, builder.credentials);
 		client.getListeners().add(this);
 		client.getListeners().addAll(builder.listeners);
-		client.setCredentials(builder.credentials);
 		client.setSessionTimeoutTime(builder.maxSessionIdleSeconds >= 0 ? builder.maxSessionIdleSeconds * 1000 : -1);
 
 		try {

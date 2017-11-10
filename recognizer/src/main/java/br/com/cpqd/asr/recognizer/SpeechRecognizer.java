@@ -172,7 +172,7 @@ public interface SpeechRecognizer {
 			this.audioSampleRate = 8000;
 			this.encoding = AudioEncoding.LINEAR16;
 			this.chunkLength = 250;
-			this.serverRTF = 0.8F;
+			this.serverRTF = 0.1F;
 			this.maxWaitSeconds = 30;
 			this.maxSessionIdleSeconds = 30;
 		}
