@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2017 CPqD. All Rights Reserved.
+ * Copyright 2018 CPqD. All Rights Reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -121,6 +121,14 @@ public class RecognitionConfig {
 		put("endpointer.autoLevelLen", endpointerAutoLevelLen);
 	}
 
+	public Boolean getContinuousMode() {
+		return getBoolean("decoder.continuousMode");
+	}
+
+	private void setContinuousMode(Boolean continuousMode) {
+		put("decoder.continuousMode", continuousMode);
+	}
+
 	public Integer getConfidenceThreshold() {
 		return getInteger("decoder.confidenceThreshold");
 	}
@@ -181,6 +189,7 @@ public class RecognitionConfig {
 	 */
 	public static class Builder {
 
+		private Boolean continuousMode;
 		private Integer confidenceThreshold;
 		private Integer maxSentences;
 		private Integer noInputTimeoutMilis;
@@ -202,6 +211,7 @@ public class RecognitionConfig {
 		 */
 		public RecognitionConfig build() {
 			RecognitionConfig config = new RecognitionConfig();
+			config.setContinuousMode(continuousMode);
 			config.setConfidenceThreshold(confidenceThreshold);
 			config.setMaxSentences(maxSentences);
 			config.setNoInputTimeout(noInputTimeoutMilis);
@@ -217,6 +227,11 @@ public class RecognitionConfig {
 			config.setRecognitionTimeoutEnabled(recognitionTimeoutEnabled);
 
 			return config;
+		}
+
+		public RecognitionConfig.Builder continuousMode(Boolean value) {
+			this.continuousMode = value;
+			return this;
 		}
 
 		public RecognitionConfig.Builder confidenceThreshold(Integer value) {

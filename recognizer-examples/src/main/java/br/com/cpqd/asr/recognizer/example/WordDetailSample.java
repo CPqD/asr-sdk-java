@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2017 CPqD. All Rights Reserved.
+ * Copyright 2018 CPqD. All Rights Reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -27,19 +27,18 @@ import br.com.cpqd.asr.recognizer.LanguageModelList;
 import br.com.cpqd.asr.recognizer.RecognitionException;
 import br.com.cpqd.asr.recognizer.RecognitionListener;
 import br.com.cpqd.asr.recognizer.SpeechRecognizer;
-import br.com.cpqd.asr.recognizer.model.Interpretation;
 import br.com.cpqd.asr.recognizer.model.PartialRecognitionResult;
 import br.com.cpqd.asr.recognizer.model.RecognitionAlternative;
 import br.com.cpqd.asr.recognizer.model.RecognitionConfig;
 import br.com.cpqd.asr.recognizer.model.RecognitionError;
 import br.com.cpqd.asr.recognizer.model.RecognitionResult;
+import br.com.cpqd.asr.recognizer.model.Word;
 
 /**
- * Exemplo de uso do cliente Java SE do servidor de reconhecimento de fala,
- * utilizando a função recognize().
+ * Exemplo de uso do cliente Java SE com detalhamento das palavras reconhecidas.
  * 
  */
-public class RecognizeSample {
+public class WordDetailSample {
 
 	public static void main(String[] args) throws DeploymentException, IOException, URISyntaxException, RecognitionException {
 
@@ -81,15 +80,14 @@ public class RecognizeSample {
 			recognizer.recognize(audio, lmList);
 			// aguarda o resultado do reconhecimento
 			RecognitionResult result = recognizer.waitRecognitionResult().get(0);
-			int i = 0;
-			for (RecognitionAlternative alt : result.getAlternatives()) {
-				System.out.println(
-						String.format("Alternative [%s] (score = %s): %s", i++, alt.getConfidence(), alt.getText()));
-				for (Interpretation interpretation : alt.getInterpretations()) {
-					int j = 0;
-					System.out.println(String.format("\t Interpretation [%s]: %s", j++, interpretation));
-				}
+			
+			RecognitionAlternative alt = result.getAlternatives().get(0);
+			System.out.println(
+					String.format("Alternative [%s] (score = %s): %s", 0, alt.getConfidence(), alt.getText()));
+			for (Word w : alt.getWordAlignment()) {
+				System.out.println(String.format("%15s [%3s] start=%5f end=%5f", w.getWord(), w.getConfidence(), w.getStartTime(), w.getEndTime()));
 			}
+			
 
 		} catch (IOException e) {
 			System.out.println("Error reading " + audioFile);

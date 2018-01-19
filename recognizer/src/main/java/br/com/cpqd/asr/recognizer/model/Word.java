@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2017 CPqD. All Rights Reserved.
+ * Copyright 2018 CPqD. All Rights Reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -15,25 +15,26 @@
  ******************************************************************************/
 package br.com.cpqd.asr.recognizer.model;
 
-public class WordAlignment {
+public class Word {
 
-	private int startTime;
-	private int endTime;
+	private float startTime;
+	private float endTime;
 	private String word;
+	private int confidence;
 
-	public int getStartTime() {
+	public float getStartTime() {
 		return startTime;
 	}
 
-	public void setStartTime(int startTime) {
+	public void setStartTime(float startTime) {
 		this.startTime = startTime;
 	}
 
-	public int getEndTime() {
+	public float getEndTime() {
 		return endTime;
 	}
 
-	public void setEndTime(int endTime) {
+	public void setEndTime(float endTime) {
 		this.endTime = endTime;
 	}
 
@@ -43,6 +44,14 @@ public class WordAlignment {
 
 	public void setWord(String word) {
 		this.word = word;
+	}
+
+	public int getConfidence() {
+		return confidence;
+	}
+
+	public void setConfidence(int confidence) {
+		this.confidence = confidence;
 	}
 
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2017 CPqD. All Rights Reserved.
+ * Copyright 2018 CPqD. All Rights Reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -51,15 +51,15 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.cpqd.asr.protocol.AsrMessage;
+import br.com.cpqd.asr.protocol.AsrMessage.AsrMessageType;
 import br.com.cpqd.asr.protocol.EndOfSpeechMessage;
+import br.com.cpqd.asr.protocol.RecogWord;
 import br.com.cpqd.asr.protocol.RecognitionResult;
 import br.com.cpqd.asr.protocol.RecognitionResultMessage;
 import br.com.cpqd.asr.protocol.ResponseMessage;
-import br.com.cpqd.asr.protocol.Sentence;
+import br.com.cpqd.asr.protocol.ResponseMessage.Result;
 import br.com.cpqd.asr.protocol.SessionStatus;
 import br.com.cpqd.asr.protocol.StartOfSpeechMessage;
-import br.com.cpqd.asr.protocol.AsrMessage.AsrMessageType;
-import br.com.cpqd.asr.protocol.ResponseMessage.Result;
 import br.com.cpqd.asr.protocol.encoder.AsrProtocolEncoder;
 import br.com.cpqd.asr.recognizer.RecognitionListener;
 import br.com.cpqd.asr.recognizer.config.Config;
@@ -69,6 +69,7 @@ import br.com.cpqd.asr.recognizer.model.RecognitionAlternative;
 import br.com.cpqd.asr.recognizer.model.RecognitionError;
 import br.com.cpqd.asr.recognizer.model.RecognitionErrorCode;
 import br.com.cpqd.asr.recognizer.model.RecognitionResultCode;
+import br.com.cpqd.asr.recognizer.model.Word;
 
 /**
  * Websocket endpoint (JSR 356) for communicating with the ASR server.
@@ -84,7 +85,7 @@ public class AsrClientEndpoint {
 			.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
 
 	private URI uri;
-	
+
 	private ClientManager clientManager;
 
 	private Session session;
@@ -94,9 +95,9 @@ public class AsrClientEndpoint {
 	private SessionStatus status;
 
 	private BlockingQueue<AsrMessage> responseQueue = new ArrayBlockingQueue<AsrMessage>(1);
-	
+
 	private int sessionTimeoutTime = -1;
-	
+
 	private boolean closeCalled;
 
 	/**
@@ -105,8 +106,7 @@ public class AsrClientEndpoint {
 	 * @param url
 	 *            the websocket server endpoint URL.
 	 * @throws URISyntaxException
-	 *             invalid server URL (e.g:
-	 *             'ws://127.0.0.1:8025/asr-server/asr').
+	 *             invalid server URL (e.g: 'ws://127.0.0.1:8025/asr-server/asr').
 	 */
 	public AsrClientEndpoint(String url, String[] credentials) throws URISyntaxException {
 		clientManager = ClientManager.createClient();
@@ -118,7 +118,7 @@ public class AsrClientEndpoint {
 		clientManager.getProperties().put(TyrusWebSocketEngine.INCOMING_BUFFER_SIZE, Config.getIncomingBufferSize());
 
 		uri = new URI(url);
-		
+
 		if (url.toLowerCase().startsWith("wss")) {
 
 			System.getProperties().put("javax.net.debug", Config.getDebugLevel());
@@ -145,7 +145,7 @@ public class AsrClientEndpoint {
 			clientManager.getProperties().put(ClientProperties.SSL_ENGINE_CONFIGURATOR, sslEngineConfigurator);
 		}
 
-		if (credentials != null) {
+		if (credentials != null && credentials.length == 2) {
 			AuthConfig authConfig = AuthConfig.Builder.create().build();
 			clientManager.getProperties().put(ClientProperties.AUTH_CONFIG, authConfig);
 			clientManager.getProperties().put(ClientProperties.CREDENTIALS,
@@ -203,8 +203,8 @@ public class AsrClientEndpoint {
 	}
 
 	/**
-	 * Send a binary message to the server, via websocket connection, and wait
-	 * for the server response.
+	 * Send a binary message to the server, via websocket connection, and wait for
+	 * the server response.
 	 * 
 	 * @param message
 	 *            the protocol message object.
@@ -299,15 +299,14 @@ public class AsrClientEndpoint {
 			status = recogResult.getSessionStatus();
 
 			for (RecognitionListener listener : listeners) {
-				if (recogResult.isPartial()) {
+				if (!recogResult.isFinalResult()) {
 					// notifica reconhecimento parcial
 					try {
 						if (recogResult.getRecognitionResult() != null
 								&& !recogResult.getRecognitionResult().getAlternatives().isEmpty()) {
-							String text = recogResult.getRecognitionResult().getAlternative(0).getText();
 							PartialRecognitionResult partialResult = new PartialRecognitionResult();
-							partialResult.setSpeechSegmentIndex(0);
-							partialResult.setText(text);
+							partialResult.setSpeechSegmentIndex(recogResult.getRecognitionResult().getSegmentIndex());
+							partialResult.setText(recogResult.getRecognitionResult().getAlternative(0).getText());
 							listener.onPartialRecognitionResult(partialResult);
 						}
 					} catch (Exception e) {
@@ -316,21 +315,31 @@ public class AsrClientEndpoint {
 
 				} else {
 					// notifica resultado final do reconhecimento (RECOGNIZED ou
-					// NO_MATCH, NO_INPUT_TIMEOUT, MAX_SPEECH, NO_SPEECH, EARLY_SPEECH, RECOGNITION_TIMEOUT
-					// FAILURE) 
+					// NO_MATCH, NO_INPUT_TIMEOUT, MAX_SPEECH, NO_SPEECH, EARLY_SPEECH,
+					// RECOGNITION_TIMEOUT
+					// FAILURE)
 					RecognitionResult result = recogResult.getRecognitionResult();
 
 					br.com.cpqd.asr.recognizer.model.RecognitionResult aResult = new br.com.cpqd.asr.recognizer.model.RecognitionResult();
 					aResult.setResultCode(RecognitionResultCode.valueOf(result.getRecognitionStatus().toString()));
-					for (Sentence s : result.getAlternatives()) {
+					aResult.setSpeechSegmentIndex(result.getSegmentIndex());
+					aResult.setLastSpeechSegment(result.isLastSegment());
+					aResult.setSentenceEndTime(result.getEndTime());
+					aResult.setSentenceStartTime(result.getStartTime());
+
+					for (br.com.cpqd.asr.protocol.RecognitionAlternative s : result.getAlternatives()) {
 						RecognitionAlternative alt = new RecognitionAlternative();
+						alt.setLanguageModel(s.getLm());
 						alt.setText(s.getText());
-						alt.setConfidence(s.getScore());
-						for (Object interpObj : s.getInterpretations()) {
+						alt.setConfidence(s.getConfidence());
+
+						// copy interpretations
+						for (int i = 0; i < s.getInterpretations().size(); i++) {
 							Interpretation interp = new Interpretation();
+							Object interpObj = s.getInterpretations().get(i);
 							try {
 								interp.setInterpretation(jsonMapper.writeValueAsString(interpObj));
-								interp.setInterpretationConfidence(0);
+								interp.setInterpretationConfidence(s.getInterpretationScoreList().get(i));
 								alt.getInterpretations().add(interp);
 							} catch (Exception e) {
 								logger.error("Error serializing intepretation obj to JSON [{}]: {}", e.getMessage(),
@@ -338,15 +347,19 @@ public class AsrClientEndpoint {
 							}
 						}
 
-						// TODO for future implementation
-						// alt.setLanguageModel(languageModel);
-						// alt.setWordAlignment(wordAlignment);
-						// alt.setWordConficence(wordConficence);
+						// populate word alignment and confidence
+						for (RecogWord word : s.getWords()) {
+							Word w = new Word();
+							w.setConfidence(word.getConfidence());
+							w.setEndTime(word.getEndTime());
+							w.setStartTime(word.getStartTime());
+							w.setWord(word.getText());
+							alt.getWordAlignment().add(w);
+						}
 
 						aResult.getAlternatives().add(alt);
 					}
 					listener.onRecognitionResult(aResult);
-
 				}
 			}
 			return;
@@ -407,7 +420,7 @@ public class AsrClientEndpoint {
 		}
 
 	}
-	
+
 	/**
 	 * Returns the websocket session id.
 	 * 
@@ -438,7 +451,8 @@ public class AsrClientEndpoint {
 	}
 
 	/**
-	 * @param sessionTimeoutTime the sessionTimeoutTime to set
+	 * @param sessionTimeoutTime
+	 *            the sessionTimeoutTime to set
 	 */
 	public void setSessionTimeoutTime(int sessionTimeoutTime) {
 		this.sessionTimeoutTime = sessionTimeoutTime;

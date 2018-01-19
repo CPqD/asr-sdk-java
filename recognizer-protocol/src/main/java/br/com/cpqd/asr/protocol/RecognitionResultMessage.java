@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2017 CPqD. All Rights Reserved.
+ * Copyright 2018 CPqD. All Rights Reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -18,19 +18,17 @@ package br.com.cpqd.asr.protocol;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 /**
- * This message contains the recognition result. 
+ * This message contains the recognition result.
  * 
  */
 public class RecognitionResultMessage extends AsrMessage {
@@ -41,7 +39,8 @@ public class RecognitionResultMessage extends AsrMessage {
 			.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
 			.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-	private static final ObjectMapper xmlMapper = new XmlMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+	private static final ObjectMapper xmlMapper = new XmlMapper()
+			.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
 	private RecognitionStatus recognitionStatus;
 
@@ -51,7 +50,6 @@ public class RecognitionResultMessage extends AsrMessage {
 
 	public RecognitionResultMessage() {
 		setmType(AsrMessageType.RECOGNITION_RESULT);
-		this.result = new RecognitionResult();
 	}
 
 	public RecognitionStatus getRecognitionStatus() {
@@ -60,15 +58,14 @@ public class RecognitionResultMessage extends AsrMessage {
 
 	public void setRecognitionStatus(RecognitionStatus status) {
 		this.recognitionStatus = status;
-		this.result.setRecognitionStatus(status);
-	}
-
-	public void addAlternative(Sentence sentence) {
-		this.result.getAlternatives().add(sentence);
 	}
 
 	public RecognitionResult getRecognitionResult() {
 		return this.result;
+	}
+
+	public void setRecognitionResult(RecognitionResult result) {
+		this.result = result;
 	}
 
 	public void setSessionStatus(SessionStatus sessionStatus) {
@@ -134,26 +131,8 @@ public class RecognitionResultMessage extends AsrMessage {
 	@Override
 	public byte[] getContent() {
 
-		if (super.getContent() == null && this.result.getAlternatives() != null
-				&& this.result.getAlternatives().size() > 0) {
-
-			// O conteudo JSON do resultado da interpretacao deve ser
-			// convertido para objeto estruturado para permitir o envio
-			// dos dados para o cliente, na forma JSON ou XML
-			for (Sentence s1 : result.getAlternatives()) {
-				try {
-					if (s1.getJsonInterpretations().size() > 0) {
-						List<Object> interpretations = jsonMapper.readValue(
-								s1.getJsonInterpretations().toString().getBytes(), new TypeReference<List<Object>>() {
-								});
-						s1.setInterpretations(interpretations);
-					}
-
-				} catch (IOException e) {
-					logger.error("Error reading Interpretation JSON value: " + s1.getJsonInterpretations().toString(),
-							e);
-				}
-			}
+		// Content was not created yet
+		if (super.getContent() == null) {
 
 			try {
 				String resultBody = null;
@@ -210,8 +189,8 @@ public class RecognitionResultMessage extends AsrMessage {
 		return map;
 	}
 
-	public boolean isPartial() {
-		return this.sessionStatus == SessionStatus.LISTENING;
+	public boolean isFinalResult() {
+		return result != null && result.isFinalResult();
 	}
 
 }

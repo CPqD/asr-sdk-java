@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2017 CPqD. All Rights Reserved.
+ * Copyright 2018 CPqD. All Rights Reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -27,20 +27,19 @@ public class RecognitionResult {
 	/** the recognition result code. */
 	private RecognitionResultCode resultCode;
 
-	/** the speech segment index when operating in continuous mode. */
+	/** the speech segment index. */
 	private int speechSegmentIndex;
 
 	/**
-	 * indicates if this is the last recognized segment, when operating in
-	 * continuous mode.
+	 * indicates if this is the last recognized segment.
 	 */
 	private boolean lastSpeechSegment;
 
-	/** the audio position when the speech start was detected (in milis). */
-	private int sentenceStartTimeMilliseconds;
+	/** the audio position when the speech start was detected (in secs). */
+	private float sentenceStartTime;
 
-	/** the audio position when the speech stop was detected (in milis). */
-	private int sentenceEndTimeMilliseconds;
+	/** the audio position when the speech stop was detected (in secs). */
+	private float sentenceEndTime;
 
 	/** the list of recognition result alternative sentences. */
 	private List<RecognitionAlternative> alternatives = new ArrayList<>();
@@ -69,20 +68,20 @@ public class RecognitionResult {
 		this.lastSpeechSegment = lastSpeechSegment;
 	}
 
-	public int getSentenceStartTimeMililiseconds() {
-		return sentenceStartTimeMilliseconds;
+	public float getSentenceStartTime() {
+		return sentenceStartTime;
 	}
 
-	public void setSentenceStartTimeMilliseconds(int sentenceStartTime) {
-		this.sentenceStartTimeMilliseconds = sentenceStartTime;
+	public void setSentenceStartTime(float sentenceStartTime) {
+		this.sentenceStartTime = sentenceStartTime;
 	}
 
-	public int getSentenceEndTimeMilliseconds() {
-		return sentenceEndTimeMilliseconds;
+	public float getSentenceEndTime() {
+		return sentenceEndTime;
 	}
 
-	public void setSentenceEndTimeMilliseconds(int sentenceEndTime) {
-		this.sentenceEndTimeMilliseconds = sentenceEndTime;
+	public void setSentenceEndTime(float sentenceEndTime) {
+		this.sentenceEndTime = sentenceEndTime;
 	}
 
 	public List<RecognitionAlternative> getAlternatives() {

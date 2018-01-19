@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2017 CPqD. All Rights Reserved.
+ * Copyright 2018 CPqD. All Rights Reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -13,27 +13,28 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package br.com.cpqd.asr.recognizer.model;
+package br.com.cpqd.asr.protocol;
 
-public class WordConfidence {
+/**
+ * The word alignment detail level. 
+ *
+ */
+public enum WordDetail {
 
-	private int confidence;
-	private String word;
+	ALL, FIRST, NONE;
 
-	public int getConfidence() {
-		return confidence;
+	public static WordDetail fromString(String str) {
+		if (str == null) {
+			return null;
+		} else if (str.toLowerCase().equals("all")) {
+			return ALL;
+		} else if (str.toLowerCase().equals("first")) {
+			return FIRST;
+		} else if (str.toLowerCase().equals("none")) {
+			return NONE;
+		} else {
+			return null;
+		}
 	}
-
-	public void setConfidence(int confidence) {
-		this.confidence = confidence;
-	}
-
-	public String getWord() {
-		return word;
-	}
-
-	public void setWord(String word) {
-		this.word = word;
-	}
-
+	
 }

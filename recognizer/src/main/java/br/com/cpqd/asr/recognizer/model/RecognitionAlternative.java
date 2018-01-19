@@ -37,11 +37,8 @@ public class RecognitionAlternative {
 	/** the interpretations result. */
 	private List<Interpretation> interpretations = new ArrayList<>();
 
-	/** the word confidence score. */
-	private List<WordConfidence> wordConficence = new ArrayList<>();
-
 	/** the word alignment list. */
-	private List<WordAlignment> wordAlignment = new ArrayList<>();
+	private List<Word> wordAlignment = new ArrayList<>();
 
 	public String getLanguageModel() {
 		return languageModel;
@@ -75,27 +72,18 @@ public class RecognitionAlternative {
 		this.interpretations = interpretations;
 	}
 
-	public List<WordConfidence> getWordConficence() {
-		return wordConficence;
-	}
-
-	public void setWordConficence(List<WordConfidence> wordConficence) {
-		this.wordConficence = wordConficence;
-	}
-
-	public List<WordAlignment> getWordAlignment() {
+	public List<Word> getWordAlignment() {
 		return wordAlignment;
 	}
 
-	public void setWordAlignment(List<WordAlignment> wordAlignment) {
+	public void setWordAlignment(List<Word> wordAlignment) {
 		this.wordAlignment = wordAlignment;
 	}
 
 	@Override
 	public String toString() {
 		return "RecognitionAlternative [lm=" + languageModel + ", text=" + text + ", confidence=" + confidence
-				+ ", interpretations=" + interpretations + ", wordConficence=" + wordConficence + ", wordAlignment="
-				+ wordAlignment + "]";
+				+ ", interpretations=" + interpretations + ", wordAlignment=" + wordAlignment + "]";
 	}
 
 }

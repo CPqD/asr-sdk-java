@@ -101,6 +101,19 @@ public interface SpeechRecognizer {
 	List<RecognitionResult> waitRecognitionResult() throws RecognitionException;
 
 	/**
+	 * Returns the recognition result. If audio packets are still being sent to the
+	 * server, the method blocks and waits for the end of the recognition process.
+	 * 
+	 * @param timeout
+	 *            the max wait time for a recognition result (in seconds). The timer
+	 *            is started after the last audio packet is sent.
+	 * @return the recognition result or null if there is no result available.
+	 * @throws RecognitionException
+	 *             in case an error in the recognition occurs.
+	 */
+	List<RecognitionResult> waitRecognitionResult(int timeout) throws RecognitionException;
+
+	/**
 	 * Creates a new instance of the object builder.
 	 * 
 	 * @return the Builder object.
@@ -216,7 +229,8 @@ public interface SpeechRecognizer {
 		 * @return the Builder object.
 		 */
 		public SpeechRecognizer.Builder credentials(String user, String passwd) {
-			this.credentials = Arrays.asList(user, passwd).toArray(new String[2]);
+			if (user != null && passwd != null)
+				this.credentials = Arrays.asList(user, passwd).toArray(new String[2]);
 			return this;
 		}
 

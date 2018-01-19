@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2017 CPqD. All Rights Reserved.
+ * Copyright 2018 CPqD. All Rights Reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -24,28 +24,79 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 /**
- * Represents the recognition result. 
+ * Represents the recognition result.
  * 
  */
 @JacksonXmlRootElement(localName = "recognition_result")
 public class RecognitionResult {
 
-	@JacksonXmlElementWrapper(localName = "alternatives")
-	@JacksonXmlProperty(localName = "alternative")
-	private List<Sentence> alternatives = new ArrayList<>();
+	@JsonProperty("segment_index")
+	private int segmentIndex;
+
+	@JsonProperty("last_segment")
+	private boolean lastSegment;
+
+	@JsonProperty("final_result")
+	private boolean finalResult;
+
+	@JsonProperty("start_time")
+	private Float startTime;
+
+	@JsonProperty("end_time")
+	private Float endTime;
 
 	@JsonProperty("result_status")
 	private RecognitionStatus recognitionStatus;
 
-	public List<Sentence> getAlternatives() {
+	@JacksonXmlElementWrapper(localName = "alternatives")
+	@JacksonXmlProperty(localName = "alternative")
+	private List<RecognitionAlternative> alternatives = new ArrayList<>();
+
+	public boolean isLastSegment() {
+		return lastSegment;
+	}
+
+	public void setLastSegment(boolean lastSegment) {
+		this.lastSegment = lastSegment;
+	}
+
+	public int getSegmentIndex() {
+		return segmentIndex;
+	}
+
+	public void setSegmentIndex(int segmentIndex) {
+		this.segmentIndex = segmentIndex;
+	}
+
+	public boolean isFinalResult() {
+		return finalResult;
+	}
+
+	public void setFinalResult(boolean finalResult) {
+		this.finalResult = finalResult;
+	}
+
+	public Float getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(Float startTime) {
+		this.startTime = startTime;
+	}
+
+	public Float getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(Float endTime) {
+		this.endTime = endTime;
+	}
+
+	public List<RecognitionAlternative> getAlternatives() {
 		return alternatives;
 	}
 
-	public void setAlternatives(List<Sentence> sentences) {
-		this.alternatives = sentences;
-	}
-
-	public Sentence getAlternative(int index) {
+	public RecognitionAlternative getAlternative(int index) {
 		if (alternatives != null && !alternatives.isEmpty() && index < alternatives.size() && index >= 0) {
 			return alternatives.get(index);
 		} else {
@@ -63,15 +114,18 @@ public class RecognitionResult {
 
 	@Override
 	public String toString() {
-		return "RecognitionResult [recognition-status=" + recognitionStatus + ", alternatives=" + alternatives + "]";
+		return "RecognitionResult [lastSegment=" + lastSegment + ", segmentIndex=" + segmentIndex + ", finalResult="
+				+ finalResult + ", alternatives=" + alternatives + ", recognitionStatus=" + recognitionStatus + "]";
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((alternatives == null) ? 0 : alternatives.hashCode());
+		result = prime * result + (finalResult ? 1231 : 1237);
+		result = prime * result + (lastSegment ? 1231 : 1237);
 		result = prime * result + ((recognitionStatus == null) ? 0 : recognitionStatus.hashCode());
+		result = prime * result + segmentIndex;
 		return result;
 	}
 
@@ -88,12 +142,13 @@ public class RecognitionResult {
 			if (getClass() != obj.getClass())
 				return false;
 			RecognitionResult other = (RecognitionResult) obj;
-			if (alternatives == null) {
-				if (other.alternatives != null)
-					return false;
-			} else if (!alternatives.get(0).getText().equals(other.alternatives.get(0).getText()))
+			if (finalResult != other.finalResult)
+				return false;
+			if (lastSegment != other.lastSegment)
 				return false;
 			if (recognitionStatus != other.recognitionStatus)
+				return false;
+			if (segmentIndex != other.segmentIndex)
 				return false;
 			return true;
 		} catch (Exception e) {
