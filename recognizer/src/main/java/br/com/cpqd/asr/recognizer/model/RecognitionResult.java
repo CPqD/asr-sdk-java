@@ -36,10 +36,10 @@ public class RecognitionResult {
 	private boolean lastSpeechSegment;
 
 	/** the audio position when the speech start was detected (in secs). */
-	private float sentenceStartTime;
+	private float segmentStartTime;
 
 	/** the audio position when the speech stop was detected (in secs). */
-	private float sentenceEndTime;
+	private float segmentEndTime;
 
 	/** the list of recognition result alternative sentences. */
 	private List<RecognitionAlternative> alternatives = new ArrayList<>();
@@ -68,20 +68,20 @@ public class RecognitionResult {
 		this.lastSpeechSegment = lastSpeechSegment;
 	}
 
-	public float getSentenceStartTime() {
-		return sentenceStartTime;
+	public float getSegmentStartTime() {
+		return segmentStartTime;
 	}
 
-	public void setSentenceStartTime(float sentenceStartTime) {
-		this.sentenceStartTime = sentenceStartTime;
+	public void setSegmentStartTime(float segmentStartTime) {
+		this.segmentStartTime = segmentStartTime;
 	}
 
-	public float getSentenceEndTime() {
-		return sentenceEndTime;
+	public float getSegmentEndTime() {
+		return segmentEndTime;
 	}
 
-	public void setSentenceEndTime(float sentenceEndTime) {
-		this.sentenceEndTime = sentenceEndTime;
+	public void setSegmentEndTime(float segmentEndTime) {
+		this.segmentEndTime = segmentEndTime;
 	}
 
 	public List<RecognitionAlternative> getAlternatives() {
