@@ -44,7 +44,7 @@ public class AsrProtocolEncoder implements Encoder.BinaryStream<AsrMessage>, Dec
 
 	private static final String PROTOCOL_NAME = "ASR";
 	private static final String PROTOCOL_MAJOR_VERSION = "2";
-	private static final String PROTOCOL_MINOR_VERSION = "2";
+	private static final String PROTOCOL_MINOR_VERSION = "3";
 
 	public static final Charset UTF_8 = Charset.forName("UTF-8");
 	private static final byte[] b = { 13, 10 };
@@ -175,15 +175,18 @@ public class AsrProtocolEncoder implements Encoder.BinaryStream<AsrMessage>, Dec
 
 		// linha em branco para finalizar a parte dos headers
 		protocol += CRLF;
-		os.write(protocol.getBytes());
 
-		// escreve o body content
-		if (message.getContent() != null) {
-			os.write(message.getContent(), 0, message.getContentLength());
+		try {
+			os.write(protocol.getBytes());
+
+			// escreve o body content
+			if (message.getContent() != null) {
+				os.write(message.getContent(), 0, message.getContentLength());
+			}
+			os.flush();
+		} finally {
+			os.close();
 		}
-
-		os.flush();
-		os.close();
 	}
 
 	/**
@@ -192,6 +195,7 @@ public class AsrProtocolEncoder implements Encoder.BinaryStream<AsrMessage>, Dec
 	 * @param is
 	 *            data inputstream from the WebSocket channel.
 	 * @return the bytes read from the input stream.
+	 * 
 	 * @throws IOException
 	 *             in case any I/O error occurs.
 	 */
@@ -242,12 +246,6 @@ public class AsrProtocolEncoder implements Encoder.BinaryStream<AsrMessage>, Dec
 		return -1;
 	}
 
-	/**
-	 * Utility method for printing the message in the log file.
-	 * 
-	 * @param buf
-	 *            the byte array from WebSocket input stream.
-	 */
 	private static void logMessage(byte[] buf) {
 		if (logger.isDebugEnabled()) {
 
