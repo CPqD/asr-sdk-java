@@ -103,12 +103,20 @@ public class AsrClientEndpoint {
 	/**
 	 * Constructor.
 	 * 
-	 * @param url
-	 *            the websocket server endpoint URL.
+	 * @param uri
+	 *            the websocket server endpoint URI.
 	 * @throws URISyntaxException
 	 *             invalid server URL (e.g: 'ws://127.0.0.1:8025/asr-server/asr').
 	 */
-	public AsrClientEndpoint(String url, String[] credentials) throws URISyntaxException {
+	public AsrClientEndpoint(URI uri, String[] credentials) throws URISyntaxException {
+		if (uri == null) {
+			throw new NullPointerException("Server URI cannot be null");
+		} else if (uri.getScheme() == null) {
+			throw new URISyntaxException("Invalid Server URI", uri.toString());
+		}
+
+		this.uri = uri;
+
 		clientManager = ClientManager.createClient();
 
 		clientManager.getProperties().put(GrizzlyClientProperties.SELECTOR_THREAD_POOL_CONFIG,
@@ -117,9 +125,7 @@ public class AsrClientEndpoint {
 				ThreadPoolConfig.defaultConfig().setMaxPoolSize(Config.getWorkerThreads()));
 		clientManager.getProperties().put(TyrusWebSocketEngine.INCOMING_BUFFER_SIZE, Config.getIncomingBufferSize());
 
-		uri = new URI(url);
-
-		if (url.toLowerCase().startsWith("wss")) {
+		if (uri.getScheme().toLowerCase().equals("wss")) {
 
 			System.getProperties().put("javax.net.debug", Config.getDebugLevel());
 
@@ -298,116 +304,126 @@ public class AsrClientEndpoint {
 			// atualiza status da sessao
 			status = recogResult.getSessionStatus();
 
-			for (RecognitionListener listener : listeners) {
-				if (!recogResult.isFinalResult()) {
-					// notifica reconhecimento parcial
+			if (recogResult.isFinalResult()) {
+				// notifica resultado final do reconhecimento (RECOGNIZED ou
+				// NO_MATCH, NO_INPUT_TIMEOUT, MAX_SPEECH, NO_SPEECH, EARLY_SPEECH,
+				// RECOGNITION_TIMEOUT
+				// FAILURE)
+				RecognitionResult result = recogResult.getRecognitionResult();
+
+				br.com.cpqd.asr.recognizer.model.RecognitionResult aResult = new br.com.cpqd.asr.recognizer.model.RecognitionResult();
+				aResult.setResultCode(RecognitionResultCode.valueOf(result.getRecognitionStatus().toString()));
+				aResult.setSpeechSegmentIndex(result.getSegmentIndex());
+				aResult.setLastSpeechSegment(result.isLastSegment());
+				aResult.setSentenceEndTime(result.getEndTime());
+				aResult.setSentenceStartTime(result.getStartTime());
+
+				for (br.com.cpqd.asr.protocol.RecognitionAlternative s : result.getAlternatives()) {
+					RecognitionAlternative alt = new RecognitionAlternative();
+					alt.setLanguageModel(s.getLm());
+					alt.setText(s.getText());
+					alt.setConfidence(s.getConfidence());
+
+					// copy interpretations
+					for (int i = 0; i < s.getInterpretations().size(); i++) {
+						Interpretation interp = new Interpretation();
+						Object interpObj = s.getInterpretations().get(i);
+						try {
+							interp.setInterpretation(jsonMapper.writeValueAsString(interpObj));
+							interp.setInterpretationConfidence(s.getInterpretationScoreList().get(i));
+							alt.getInterpretations().add(interp);
+						} catch (Exception e) {
+							logger.error("Error serializing intepretation obj to JSON [{}]: {}", e.getMessage(),
+									interpObj.toString());
+						}
+					}
+
+					// populate word alignment and confidence
+					for (RecogWord word : s.getWords()) {
+						Word w = new Word();
+						w.setConfidence(word.getConfidence());
+						w.setEndTime(word.getEndTime());
+						w.setStartTime(word.getStartTime());
+						w.setWord(word.getText());
+						alt.getWordAlignment().add(w);
+					}
+
+					aResult.getAlternatives().add(alt);
+				}
+
+				for (RecognitionListener listener : listeners) {
 					try {
-						if (recogResult.getRecognitionResult() != null
-								&& !recogResult.getRecognitionResult().getAlternatives().isEmpty()) {
-							PartialRecognitionResult partialResult = new PartialRecognitionResult();
-							partialResult.setSpeechSegmentIndex(recogResult.getRecognitionResult().getSegmentIndex());
-							partialResult.setText(recogResult.getRecognitionResult().getAlternative(0).getText());
-							listener.onPartialRecognitionResult(partialResult);
-						}
+						listener.onRecognitionResult(aResult);
 					} catch (Exception e) {
-						logger.warn("Error notifying listeners of partial result", e);
+						logger.warn("Error notifying listener of final result", e);
 					}
+				}
+			} else {
+				// reconhecimento parcial
+				if (recogResult.getRecognitionResult() != null
+						&& !recogResult.getRecognitionResult().getAlternatives().isEmpty()) {
+					PartialRecognitionResult partialResult = new PartialRecognitionResult();
+					partialResult.setSpeechSegmentIndex(recogResult.getRecognitionResult().getSegmentIndex());
+					partialResult.setText(recogResult.getRecognitionResult().getAlternative(0).getText());
 
-				} else {
-					// notifica resultado final do reconhecimento (RECOGNIZED ou
-					// NO_MATCH, NO_INPUT_TIMEOUT, MAX_SPEECH, NO_SPEECH, EARLY_SPEECH,
-					// RECOGNITION_TIMEOUT
-					// FAILURE)
-					RecognitionResult result = recogResult.getRecognitionResult();
-
-					br.com.cpqd.asr.recognizer.model.RecognitionResult aResult = new br.com.cpqd.asr.recognizer.model.RecognitionResult();
-					aResult.setResultCode(RecognitionResultCode.valueOf(result.getRecognitionStatus().toString()));
-					aResult.setSpeechSegmentIndex(result.getSegmentIndex());
-					aResult.setLastSpeechSegment(result.isLastSegment());
-					aResult.setSentenceEndTime(result.getEndTime());
-					aResult.setSentenceStartTime(result.getStartTime());
-
-					for (br.com.cpqd.asr.protocol.RecognitionAlternative s : result.getAlternatives()) {
-						RecognitionAlternative alt = new RecognitionAlternative();
-						alt.setLanguageModel(s.getLm());
-						alt.setText(s.getText());
-						alt.setConfidence(s.getConfidence());
-
-						// copy interpretations
-						for (int i = 0; i < s.getInterpretations().size(); i++) {
-							Interpretation interp = new Interpretation();
-							Object interpObj = s.getInterpretations().get(i);
-							try {
-								interp.setInterpretation(jsonMapper.writeValueAsString(interpObj));
-								interp.setInterpretationConfidence(s.getInterpretationScoreList().get(i));
-								alt.getInterpretations().add(interp);
-							} catch (Exception e) {
-								logger.error("Error serializing intepretation obj to JSON [{}]: {}", e.getMessage(),
-										interpObj.toString());
-							}
+					for (RecognitionListener listener : listeners) {
+						try {
+							listener.onPartialRecognitionResult(partialResult);
+						} catch (Exception e) {
+							logger.warn("Error notifying listener of partial result", e);
 						}
-
-						// populate word alignment and confidence
-						for (RecogWord word : s.getWords()) {
-							Word w = new Word();
-							w.setConfidence(word.getConfidence());
-							w.setEndTime(word.getEndTime());
-							w.setStartTime(word.getStartTime());
-							w.setWord(word.getText());
-							alt.getWordAlignment().add(w);
-						}
-
-						aResult.getAlternatives().add(alt);
 					}
-					listener.onRecognitionResult(aResult);
 				}
 			}
-			return;
 
 		} else if (message instanceof ResponseMessage) {
 			ResponseMessage resp = (ResponseMessage) message;
 			// atualiza status da sessao
 			status = resp.getSessionStatus();
 
-			if (resp.getResult().equals(Result.SUCCESS)) {
-				// notifica o evento de LISTENING
-				if (resp.getMethod().equals(AsrMessageType.START_RECOGNITION)
-						&& resp.getSessionStatus().equals(SessionStatus.LISTENING)) {
-					for (RecognitionListener listener : listeners) {
-						listener.onListening();
-					}
-				}
-			} else if (resp.getMethod().equals(AsrMessageType.SEND_AUDIO)) {
+			if (resp.getMethod().equals(AsrMessageType.SEND_AUDIO) && !resp.getResult().equals(Result.SUCCESS)) {
 				// evita de inserir resposta de erro na fila de mensagens (pode
 				// prejudicar comunicacao do cliente com servidor)
 				logger.warn("[{}] Audio packet rejected by server", resp.getHandle());
-				return;
+
+			} else {
+				// ao receber a mensagem do servidor, adiciona na fila
+				try {
+					if (!responseQueue.offer(message)) {
+						logger.warn("Messsage discarded. Result queue is full. {}", message.toString());
+					}
+				} catch (Exception e) {
+					logger.error("Error putting message in queue: {}", message.toString(), e);
+				}
+			}
+
+			// notifica o evento de LISTENING
+			if (resp.getMethod().equals(AsrMessageType.START_RECOGNITION)
+					&& resp.getSessionStatus().equals(SessionStatus.LISTENING)) {
+				for (RecognitionListener listener : listeners) {
+					listener.onListening();
+				}
 			}
 
 		} else if (message instanceof StartOfSpeechMessage) {
 			for (RecognitionListener listener : listeners) {
 				int time = 0; // TODO for future implementation
-				listener.onSpeechStart(time);
+				try {
+					listener.onSpeechStart(time);
+				} catch (Exception e) {
+				}
 			}
-			return;
 
 		} else if (message instanceof EndOfSpeechMessage) {
 			// atualiza status da sessao
 			status = ((EndOfSpeechMessage) message).getSessionStatus();
 			for (RecognitionListener listener : listeners) {
 				int time = 0; // TODO for future implementation
-				listener.onSpeechStop(time);
+				try {
+					listener.onSpeechStop(time);
+				} catch (Exception e) {
+				}
 			}
-			return;
-		}
-
-		// ao receber a mensagem do servidor, adiciona na fila
-		try {
-			if (!responseQueue.offer(message)) {
-				logger.warn("Messsage discarded. Result queue is full. {}", message.toString());
-			}
-		} catch (Exception e) {
-			logger.error("Error putting message in queue: {}", message.toString(), e);
 		}
 	}
 
@@ -418,7 +434,6 @@ public class AsrClientEndpoint {
 		} else {
 			logger.warn("Unexpected error", thr);
 		}
-
 	}
 
 	/**
@@ -430,7 +445,6 @@ public class AsrClientEndpoint {
 		if (isOpen()) {
 			return session.getId();
 		}
-
 		return null;
 	}
 

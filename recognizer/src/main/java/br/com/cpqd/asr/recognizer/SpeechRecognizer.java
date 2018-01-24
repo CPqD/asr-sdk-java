@@ -16,6 +16,7 @@
 package br.com.cpqd.asr.recognizer;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -128,8 +129,11 @@ public interface SpeechRecognizer {
 	 */
 	public class Builder {
 
+		@SuppressWarnings("unused")
+		private static final String VALID_URL_REGEXP = "\"_^(?:(?:https?|ftp)://)(?:\\\\S+(?::\\\\S*)?@)?(?:(?!10(?:\\\\.\\\\d{1,3}){3})(?!127(?:\\\\.\\\\d{1,3}){3})(?!169\\\\.254(?:\\\\.\\\\d{1,3}){2})(?!192\\\\.168(?:\\\\.\\\\d{1,3}){2})(?!172\\\\.(?:1[6-9]|2\\\\d|3[0-1])(?:\\\\.\\\\d{1,3}){2})(?:[1-9]\\\\d?|1\\\\d\\\\d|2[01]\\\\d|22[0-3])(?:\\\\.(?:1?\\\\d{1,2}|2[0-4]\\\\d|25[0-5])){2}(?:\\\\.(?:[1-9]\\\\d?|1\\\\d\\\\d|2[0-4]\\\\d|25[0-4]))|(?:(?:[a-z\\\\x{00a1}-\\\\x{ffff}0-9]+-?)*[a-z\\\\x{00a1}-\\\\x{ffff}0-9]+)(?:\\\\.(?:[a-z\\\\x{00a1}-\\\\x{ffff}0-9]+-?)*[a-z\\\\x{00a1}-\\\\x{ffff}0-9]+)*(?:\\\\.(?:[a-z\\\\x{00a1}-\\\\x{ffff}]{2,})))(?::\\\\d{2,5})?(?:/[^\\\\s]*)?$_iuS\"";
+
 		/** The ASR Server URL. */
-		public String url;
+		public URI uri;
 
 		/** The User Agent data. */
 		public String userAgent;
@@ -213,9 +217,10 @@ public interface SpeechRecognizer {
 		 *            the ASR Server endpoint URL (e.g.:
 		 *            ws://192.168.100.1:8025/asr-server).
 		 * @return the Builder object
+		 * @throws URISyntaxException 
 		 */
-		public SpeechRecognizer.Builder serverURL(String url) {
-			this.url = url;
+		public SpeechRecognizer.Builder serverURL(String url) throws URISyntaxException {
+			this.uri = new URI(url);
 			return this;
 		}
 
