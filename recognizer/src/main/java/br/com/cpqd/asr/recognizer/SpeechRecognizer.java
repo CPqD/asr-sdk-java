@@ -24,7 +24,6 @@ import java.util.List;
 
 import br.com.cpqd.asr.recognizer.model.RecognitionConfig;
 import br.com.cpqd.asr.recognizer.model.RecognitionResult;
-import br.com.cpqd.asr.recognizer.ws.SpeechRecognizerImpl;
 
 /**
  * The SpeechRecognizer allows a client application to submit an audio input
@@ -129,57 +128,54 @@ public interface SpeechRecognizer {
 	 */
 	public class Builder {
 
-		@SuppressWarnings("unused")
-		private static final String VALID_URL_REGEXP = "\"_^(?:(?:https?|ftp)://)(?:\\\\S+(?::\\\\S*)?@)?(?:(?!10(?:\\\\.\\\\d{1,3}){3})(?!127(?:\\\\.\\\\d{1,3}){3})(?!169\\\\.254(?:\\\\.\\\\d{1,3}){2})(?!192\\\\.168(?:\\\\.\\\\d{1,3}){2})(?!172\\\\.(?:1[6-9]|2\\\\d|3[0-1])(?:\\\\.\\\\d{1,3}){2})(?:[1-9]\\\\d?|1\\\\d\\\\d|2[01]\\\\d|22[0-3])(?:\\\\.(?:1?\\\\d{1,2}|2[0-4]\\\\d|25[0-5])){2}(?:\\\\.(?:[1-9]\\\\d?|1\\\\d\\\\d|2[0-4]\\\\d|25[0-4]))|(?:(?:[a-z\\\\x{00a1}-\\\\x{ffff}0-9]+-?)*[a-z\\\\x{00a1}-\\\\x{ffff}0-9]+)(?:\\\\.(?:[a-z\\\\x{00a1}-\\\\x{ffff}0-9]+-?)*[a-z\\\\x{00a1}-\\\\x{ffff}0-9]+)*(?:\\\\.(?:[a-z\\\\x{00a1}-\\\\x{ffff}]{2,})))(?::\\\\d{2,5})?(?:/[^\\\\s]*)?$_iuS\"";
-
 		/** The ASR Server URL. */
-		public URI uri;
+		protected URI uri;
 
 		/** The User Agent data. */
-		public String userAgent;
+		protected String userAgent;
 
 		/** User access credentials. */
-		public String[] credentials;
+		protected String[] credentials;
 
 		/** The recognition configuration parameters. */
-		public RecognitionConfig recogConfig;
+		protected RecognitionConfig recogConfig;
 
 		/** Registered listener interfaces. */
-		public List<RecognitionListener> listeners = new ArrayList<>();
+		protected List<RecognitionListener> listeners = new ArrayList<>();
 
 		/** the audio encoding. */
-		public AudioEncoding encoding;
+		protected AudioEncoding encoding;
 
 		/** the audio sample rate. */
-		public Integer audioSampleRate;
+		protected Integer audioSampleRate;
 
 		/** the audio language. */
-		public LanguageCode language;
+		protected LanguageCode language;
 
 		/** the audio packets length. */
-		public Integer chunkLength;
+		protected Integer chunkLength;
 
 		/** the server Real Time Factor. */
-		public Float serverRTF;
+		protected Float serverRTF;
 
 		/** the maximum time to wait for a recognition result. */
-		public Integer maxWaitSeconds;
+		protected Integer maxWaitSeconds;
 
 		/**
 		 * If set to true, the ASR session is created at each recognition.
 		 * Otherwise, it is created when the SpeechRecognizer instance is built.
 		 */
-		public boolean connectOnRecognize;
+		protected boolean connectOnRecognize;
 
 		/**
 		 * If set to true, the ASR session is automatically closed at the end of
 		 * each recognition. Otherwise, it is kept open, available for further
 		 * recognitions.
 		 */
-		public boolean autoClose;
+		protected boolean autoClose;
 
 		/** The maximum time the ASR session is kept open and idle. */
-		public int maxSessionIdleSeconds;
+		protected int maxSessionIdleSeconds;
 
 		/**
 		 * Private constructor. Defines default configuration parameters.

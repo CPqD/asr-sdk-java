@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package br.com.cpqd.asr.recognizer.ws;
+package br.com.cpqd.asr.recognizer;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.websocket.DeploymentException;
@@ -40,16 +40,12 @@ import br.com.cpqd.asr.protocol.SendAudio;
 import br.com.cpqd.asr.protocol.SessionStatus;
 import br.com.cpqd.asr.protocol.SetParametersMessage;
 import br.com.cpqd.asr.protocol.StartRecognition;
-import br.com.cpqd.asr.recognizer.AudioSource;
-import br.com.cpqd.asr.recognizer.LanguageModelList;
-import br.com.cpqd.asr.recognizer.RecognitionException;
-import br.com.cpqd.asr.recognizer.RecognitionListener;
-import br.com.cpqd.asr.recognizer.SpeechRecognizer;
 import br.com.cpqd.asr.recognizer.model.PartialRecognitionResult;
 import br.com.cpqd.asr.recognizer.model.RecognitionConfig;
 import br.com.cpqd.asr.recognizer.model.RecognitionError;
 import br.com.cpqd.asr.recognizer.model.RecognitionErrorCode;
 import br.com.cpqd.asr.recognizer.model.RecognitionResult;
+import br.com.cpqd.asr.recognizer.ws.AsrClientEndpoint;
 
 /**
  * The SpeechRecognizer implementation.
@@ -69,7 +65,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 	private AsrClientEndpoint client;
 
 	/** blocking queue to read recognition result. */
-	private Queue<RecognitionResult> sentencesQueue = new LinkedBlockingQueue<RecognitionResult>();
+	private BlockingQueue<RecognitionResult> sentencesQueue = new LinkedBlockingQueue<RecognitionResult>();
 
 	/** Temporarily stores a recognition error. */
 	private RecognitionError error;
@@ -126,7 +122,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 			throw new IOException("Websocket session is closed");
 
 		if (readerTask != null && readerTask.isRunning()) {
-			// encerra a reader task.
+			// cancela a reader task.
 			readerTask.cancel();
 			logger.debug("[{}] Reader task cancelled.", handle);
 		}
@@ -139,6 +135,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 			if (response == null) {
 				logger.error("[{}] Timeout canceling recognition.", handle);
 				throw new RecognitionException(RecognitionErrorCode.FAILURE, "Operation timeout");
+
 			} else if (Result.SUCCESS.equals(response.getResult())) {
 				logger.debug("[{}] Recognition canceled ({}).", handle, response.getSessionStatus());
 
@@ -191,7 +188,6 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 					logger.error("Timeout creating session.");
 					this.handle = null;
 					throw new RecognitionException(RecognitionErrorCode.FAILURE, "Operation timeout");
-
 				} else if (Result.SUCCESS.equals(response.getResult())
 						&& SessionStatus.IDLE.equals(response.getSessionStatus())) {
 					this.handle = response.getHandle();
@@ -260,13 +256,11 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 	@Override
 	public synchronized void recognize(AudioSource audio, LanguageModelList lm, RecognitionConfig recogConfig)
 			throws IOException, RecognitionException {
-		logger.debug("[{}] Recognize called... Reader task is {}. Client is {}. Status = {}", handle,
-				getReaderTaskStatus(), client.isOpen() ? "opened" : "closed",
-				readerTask != null ? readerTask.getStatus() : "null");
+		logger.debug("[{}] Recognize called... Reader task is {}. Client is {}.", handle, getReaderTaskStatus(),
+				client.isOpen() ? "opened" : "closed");
 
 		if (readerTask != null && readerTask.isRunning()) {
-			logger.warn("[{}] Another recognition is running [{}]", this.handle,
-					readerTask != null ? readerTask.getThreadName() : "null");
+			logger.warn("[{}] Another recognition is running [{}]", this.handle, readerTask.getThreadName());
 			throw new RecognitionException(RecognitionErrorCode.FAILURE, "Another recognition is running");
 		}
 
@@ -283,8 +277,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 		this.error = null;
 		this.audio = audio;
 
-		// cria uma thread para ler o audio source e enviar os pacotes
-		// para o servidor
+		// cria uma thread para ler o audio source e enviar os pacotes para o servidor
 		readerTask = new ReaderTask(audio);
 
 		startRecognition(lm, recogConfig);
@@ -298,19 +291,16 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 	@Override
 	public synchronized List<RecognitionResult> waitRecognitionResult(int timeout) throws RecognitionException {
 		logger.debug("[{}] Wait called... Reader task is {}. Client is {}. Status = {}", handle, getReaderTaskStatus(),
-				client.isOpen() ? "opened" : "closed", readerTask != null ? readerTask.getStatus() : "null");
+				client.isOpen() ? "opened" : "closed", client.getStatus());
 
-		if (readerTask == null) {
+		if (readerTask == null || (readerTask != null && readerTask.isCancelled())) {
 			// chamou wait sem executar um reconhecimento
 			return new ArrayList<>(0);
 		}
 
 		if (readerTask.isRunning()) {
-			// se a thread está enviando audio, bloqueia a thread aguardando o fim do
-			// processo
-			long start = System.currentTimeMillis();
+			// se o audio está sendo enviado, bloqueia a thread aguardando o fim do processo
 			while (readerTask.isRunning()) {
-				logger.debug("waiting end of audio transfer. reader task is " + readerTask.getStatus());
 				try {
 					synchronized (audio) {
 						audio.wait(3000);
@@ -318,21 +308,22 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 				} catch (InterruptedException e) {
 				}
 			}
-			logger.debug("audio transfer complete. reader task is " + readerTask.getStatus());
+
 			if (readerTask.isCancelled()) {
+				logger.debug("Audio transfer canceled");
 				// se tarefa foi cancelada, devolve resultado vazio
 				return new ArrayList<>(0);
 			}
+		}
 
-			logger.debug("waiting recognition result");
+		if (client.isOpen() && client.getStatus() != SessionStatus.IDLE) {
+			// se o servidor está processando, aguarda o recebimento do resultado
 			try {
 				synchronized (sentencesQueue) {
 					sentencesQueue.wait(timeout * 1000);
 				}
 			} catch (InterruptedException e) {
 			}
-
-			logger.debug("[{}] Waited for {} ms", handle, (System.currentTimeMillis() - start));
 		}
 
 		try {
@@ -366,7 +357,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 
 	@Override
 	public void onSpeechStart(Integer time) {
-		logger.trace("[{}] Speech started.", handle);
+		logger.debug("[{}] Speech started.", handle);
 	}
 
 	@Override
@@ -386,7 +377,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 		logger.debug("[{}] Recognition result (last={}): {}", this.handle, result.isLastSpeechSegment(),
 				result.toString());
 
-		if (!sentencesQueue.add(result)) {
+		if (!sentencesQueue.offer(result)) {
 			logger.warn("[{}] Messsage discarded, sentences queue is full: {}", this.handle, result);
 		}
 
@@ -394,15 +385,18 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 		if (result.isLastSpeechSegment()) {
 			synchronized (sentencesQueue) {
 				sentencesQueue.notifyAll();
-				logger.debug("sentencesQueue object notified");
 			}
 
 			if (builder.autoClose) {
-				try {
-					close();
-				} catch (IOException e) {
-					logger.error("[{}] Error closing session", handle, e);
-				}
+				new Thread(() -> {
+					// executa o fechamento da sessao e canal em outra thread para nao bloquear
+					// a thread que ouve/recebe mensagens pelo websocket
+					try {
+						close();
+					} catch (IOException e) {
+						logger.error("[{}] Error closing session", handle, e);
+					}
+				}).start();
 			}
 		}
 	}
@@ -414,22 +408,28 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 
 	@Override
 	public void onError(RecognitionError error) {
+		if (error.getCode() == RecognitionErrorCode.SESSION_TIMEOUT) {
+			// ignora evento de timeout de sessao
+			return;
+		}
+
 		logger.warn("[{}] Recognition error: {}", this.handle, error.toString());
 
-		synchronized (sentencesQueue) {
-			sentencesQueue.notifyAll();
-			logger.debug("sentencesQueue object notified");
+		if (readerTask != null && readerTask.isRunning()) {
+			// o servidor nao esta mais ouvindo. Encerra o envio de audio
+			try {
+				this.audio.finish();
+			} catch (IOException e) {
+				logger.error("[{}] Error calling finish recognition.", this.handle, e);
+			}
+
+			synchronized (sentencesQueue) {
+				sentencesQueue.notifyAll();
+			}
 		}
 
-		// o servidor nao esta mais ouvindo. Encerra o envio de audio
-		try {
-			this.audio.finish();
-		} catch (IOException e) {
-			logger.error("[{}] Error calling finish recognition.", this.handle, e);
-		}
-
-		// recebeu resultado final. fecha a sessao
 		if (builder.autoClose) {
+			// acabou o reconhecimento. fecha a sessao
 			try {
 				close();
 			} catch (IOException e) {
@@ -561,7 +561,8 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 	 */
 	private void sendAudio(byte[] audio, int audioLength, boolean lastPacket) throws IOException {
 		if (!client.isOpen())
-			throw new IOException("Websocket session is closed");
+			return;
+		// throw new IOException("Websocket session is closed");
 
 		SendAudio message = new SendAudio();
 		message.setHandle(this.handle);
@@ -570,8 +571,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 		message.setContentType(SendAudio.APPLICATION_OCTET_STREAM);
 		message.setLastPacket(lastPacket);
 
-		// SEND AUDIO nao recebe confirmacao de recebimento (exceto em caso de
-		// erro)
+		// SEND AUDIO nao recebe confirmacao de recebimento (exceto em caso de erro)
 		try {
 			client.sendMessage(message);
 		} catch (EncodeException e) {
@@ -616,10 +616,6 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 			this.readerStatus = ReaderTaskStatus.IDLE;
 		}
 
-		public ReaderTaskStatus getStatus() {
-			return readerStatus;
-		}
-
 		public String getThreadName() {
 			return this.threadName;
 		}
@@ -638,8 +634,8 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 
 		@Override
 		public void run() {
-			this.threadName = Thread.currentThread().getName();
 			readerStatus = ReaderTaskStatus.RUNNING;
+			this.threadName = Thread.currentThread().getName();
 
 			final int chunkSize = calculateBufferSize(builder.chunkLength, builder.audioSampleRate,
 					builder.encoding.getSampleSize());
@@ -682,7 +678,6 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 				} catch (Exception e) {
 					logger.error("[{}] Error closing audio source", handle, e);
 				}
-
 			}
 		}
 

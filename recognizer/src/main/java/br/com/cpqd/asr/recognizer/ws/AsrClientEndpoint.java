@@ -220,7 +220,7 @@ public class AsrClientEndpoint {
 	 * @throws EncodeException
 	 *             error when encoding the ASR message to binary message.
 	 */
-	public ResponseMessage sendMessageAndWait(AsrMessage message) throws IOException, EncodeException {
+	public synchronized ResponseMessage sendMessageAndWait(AsrMessage message) throws IOException, EncodeException {
 		session.getBasicRemote().sendObject(message);
 		try {
 			ResponseMessage response = (ResponseMessage) responseQueue.poll(Config.getExecutorTimeout(),
@@ -241,7 +241,7 @@ public class AsrClientEndpoint {
 	 * @throws EncodeException
 	 *             error when encoding the ASR message to binary message.
 	 */
-	public void sendMessage(AsrMessage message) throws IOException, EncodeException {
+	public synchronized void sendMessage(AsrMessage message) throws IOException, EncodeException {
 		session.getBasicRemote().sendObject(message);
 	}
 
@@ -268,8 +268,8 @@ public class AsrClientEndpoint {
 	@OnClose
 	public void onClose(Session session, CloseReason closeReason) {
 		logger.trace("Connection closed because of {}", closeReason);
-		// notificar os listeners caso a sessao tenha sido encerrada
-		// abrutamente: encerrar reconhecimentos em andamento
+		// notificar os listeners caso a sessao tenha sido encerrada abrutamente
+		// encerrar reconhecimentos em andamento
 		if (!closeCalled) {
 			String closeStr = closeReason.getCloseCode()
 					+ (closeReason.getReasonPhrase().length() > 0 ? " - " + closeReason.getReasonPhrase() : "");
@@ -284,7 +284,12 @@ public class AsrClientEndpoint {
 			for (RecognitionListener listener : this.listeners) {
 				listener.onError(new RecognitionError(code, closeStr));
 			}
+		}
 
+		synchronized (responseQueue) {
+			// notifica alguma thread que esteja aguardando resposta no método
+			// sendMessageAndWait()
+			responseQueue.notifyAll();
 		}
 	}
 
@@ -300,6 +305,7 @@ public class AsrClientEndpoint {
 	public void onMessage(AsrMessage message, Session session) {
 
 		if (message instanceof RecognitionResultMessage) {
+
 			RecognitionResultMessage recogResult = (RecognitionResultMessage) message;
 			// atualiza status da sessao
 			status = recogResult.getSessionStatus();
@@ -315,8 +321,8 @@ public class AsrClientEndpoint {
 				aResult.setResultCode(RecognitionResultCode.valueOf(result.getRecognitionStatus().toString()));
 				aResult.setSpeechSegmentIndex(result.getSegmentIndex());
 				aResult.setLastSpeechSegment(result.isLastSegment());
-				aResult.setSentenceEndTime(result.getEndTime());
-				aResult.setSentenceStartTime(result.getStartTime());
+				aResult.setSegmentEndTime(result.getEndTime());
+				aResult.setSegmentStartTime(result.getStartTime());
 
 				for (br.com.cpqd.asr.protocol.RecognitionAlternative s : result.getAlternatives()) {
 					RecognitionAlternative alt = new RecognitionAlternative();
@@ -378,18 +384,19 @@ public class AsrClientEndpoint {
 
 		} else if (message instanceof ResponseMessage) {
 			ResponseMessage resp = (ResponseMessage) message;
+
 			// atualiza status da sessao
 			status = resp.getSessionStatus();
 
 			if (resp.getMethod().equals(AsrMessageType.SEND_AUDIO) && !resp.getResult().equals(Result.SUCCESS)) {
 				// evita de inserir resposta de erro na fila de mensagens (pode
 				// prejudicar comunicacao do cliente com servidor)
-				logger.warn("[{}] Audio packet rejected by server", resp.getHandle());
+				logger.debug("[{}] Audio packet rejected by server", resp.getHandle());
 
 			} else {
 				// ao receber a mensagem do servidor, adiciona na fila
 				try {
-					if (!responseQueue.offer(message)) {
+					if (!responseQueue.add(message)) {
 						logger.warn("Messsage discarded. Result queue is full. {}", message.toString());
 					}
 				} catch (Exception e) {

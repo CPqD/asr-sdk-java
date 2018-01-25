@@ -18,6 +18,8 @@ package br.com.cpqd.asr.recognizer;
 import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Audio source implementation of a piped circular buffer. The application
@@ -36,12 +38,14 @@ public class BufferAudioSource implements AudioSource {
 	private PipedOutputStream output;
 	private PipedInputStream input;
 
+	private ReadWriteLock lock = new ReentrantReadWriteLock();
+
 	private boolean finished = false;
 
 	/**
-	 * Creates an audio source, where bytes can be written in a circular buffer
-	 * by one thread (application's), and read by a different thread (to send
-	 * data to the ASR Server).
+	 * Creates an audio source, where bytes can be written in a circular buffer by
+	 * one thread (application's), and read by a different thread (to send data to
+	 * the ASR Server).
 	 * 
 	 * @throws IOException
 	 *             if an I/O error occurs.
@@ -53,9 +57,9 @@ public class BufferAudioSource implements AudioSource {
 	}
 
 	/**
-	 * Creates an audio source, where bytes can be written in a circular buffer
-	 * by one thread (application's), and read by a different thread (to send
-	 * data to the ASR Server).
+	 * Creates an audio source, where bytes can be written in a circular buffer by
+	 * one thread (application's), and read by a different thread (to send data to
+	 * the ASR Server).
 	 * 
 	 * @param size
 	 *            the buffer size (in bytes)
@@ -75,6 +79,9 @@ public class BufferAudioSource implements AudioSource {
 
 	@Override
 	public void close() throws IOException {
+		lock.writeLock().lock();
+		finished = true;
+		lock.writeLock().unlock();
 		input.close();
 	}
 
@@ -86,25 +93,28 @@ public class BufferAudioSource implements AudioSource {
 	 * @param len
 	 *            number of characters to write
 	 * 
-	 * @return returns 'false' if the buffer was finished and the byte array was
-	 *         not written.
+	 * @return returns 'false' if the buffer was finished and the byte array was not
+	 *         written.
 	 * @throws IOException
-	 *             if the buffer is broken, unconnected or if an I/O error
-	 *             occurs.
+	 *             if the buffer is broken, unconnected or if an I/O error occurs.
 	 */
 	public boolean write(byte[] b, int len) throws IOException {
-		if (!finished) {
-			output.write(b, 0, len);
-			return true;
-		} else {
-			return false;
+		try {
+			lock.readLock().lock();
+			if (!finished) {
+				output.write(b, 0, len);
+				return true;
+			} else {
+				return false;
+			}
+		} finally {
+			lock.readLock().unlock();
 		}
 	}
 
 	/**
-	 * Flushes the output stream and forces any buffered output bytes to be
-	 * written out. This will notify any readers that bytes are waiting in the
-	 * pipe.
+	 * Flushes the output stream and forces any buffered output bytes to be written
+	 * out. This will notify any readers that bytes are waiting in the pipe.
 	 * 
 	 * @throws IOException
 	 *             if an I/O error occurs.
@@ -114,14 +124,16 @@ public class BufferAudioSource implements AudioSource {
 	}
 
 	/**
-	 * Closes the output stream and releases any system resources associated
-	 * with this stream. This stream may no longer be used for writing bytes.
+	 * Closes the output stream and releases any system resources associated with
+	 * this stream. This stream may no longer be used for writing bytes.
 	 * 
 	 * @throws IOException
 	 *             if an I/O error occurs.
 	 */
 	public void finish() throws IOException {
+		lock.writeLock().lock();
 		finished = true;
+		lock.writeLock().unlock();
 		output.flush();
 		output.close();
 	}
