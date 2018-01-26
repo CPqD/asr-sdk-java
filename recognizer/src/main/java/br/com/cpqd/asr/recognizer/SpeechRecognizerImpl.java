@@ -118,15 +118,20 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 		logger.debug("[{}] Cancel called... Reader task is {}. Client is {}.", handle, getReaderTaskStatus(),
 				client.isOpen() ? "opened" : "closed");
 
-		if (!client.isOpen())
-			throw new IOException("Websocket session is closed");
-
+		if (!client.isOpen()) {
+			return;
+		}
+				
 		if (readerTask != null && readerTask.isRunning()) {
 			// cancela a reader task.
 			readerTask.cancel();
 			logger.debug("[{}] Reader task cancelled.", handle);
 		}
-
+		
+		if (client.getStatus() == SessionStatus.IDLE) {
+			return;
+		}
+		
 		CancelRecognition message = new CancelRecognition();
 		message.setHandle(this.handle);
 		try {

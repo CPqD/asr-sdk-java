@@ -31,7 +31,7 @@ import br.com.cpqd.asr.recognizer.model.RecognitionResultCode;
 
 public class SpeechRecognizerTest {
 
-	private static final String url = "wss://speech.cpqd.com.br/asr/ws/v2/recognize/8k"; // "wss://speech.cpqd.com.br/asr/ws/estevan/recognize/8k";
+	private static final String url = "wss://speech.cpqd.com.br/asr/ws/estevan/recognize/8k"; //"wss://speech.cpqd.com.br/asr/ws/v2/recognize/8k"; // "wss://speech.cpqd.com.br/asr/ws/estevan/recognize/8k";
 	private static final String user = "estevan";
 	private static final String passwd = "Thect195";
 	private static final String filename = "./src/test/resources/audio/pizza-veg-8k.wav";
@@ -427,9 +427,10 @@ public class SpeechRecognizerTest {
 		try {
 			recognizer = SpeechRecognizer.builder().serverURL(url).credentials(user, passwd).build();
 			recognizer.cancelRecognition();
-			fail("Failure expected");
+			assertTrue("Normal return", true);
+
 		} catch (RecognitionException e) {
-			assertTrue("Failure: " + e.getMessage(), true);
+			fail("Failure: " + e.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("Test failed: " + e.getMessage());
