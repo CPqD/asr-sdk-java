@@ -30,6 +30,7 @@
 
 		<skipTests>true</skipTests>
 
+		<maven-release-plugin.version>2.5.3</maven-release-plugin.version>
 		<maven-compiler-plugin.version>3.6.0</maven-compiler-plugin.version>
 		<maven-dependency-plugin.version>3.0.1</maven-dependency-plugin.version>
 		<maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
@@ -82,6 +83,10 @@
 		</dependencies>
 	</dependencyManagement>
 
+	<scm>
+		<developerConnection>scm:git:git://github.com/CPqD/asr-sdk-java.git</developerConnection>
+	</scm>
+
 	<build>
 		<pluginManagement>
 			<plugins>
@@ -103,6 +108,12 @@
 						<skipTests>${skipTests}</skipTests>
 					</configuration>
 				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-release-plugin</artifactId>
+					<version>${maven-release-plugin.version}</version>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
@@ -118,7 +129,6 @@
 		</developer>
 		<developer>
 			<name>Luis Augusto de Sa Pessoa</name>
-			<email>luisp@cpqd.com.br</email>
 			<timezone>America/Sao_Paulo</timezone>
 			<roles>
 				<role>committer</role>
