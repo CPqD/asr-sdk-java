@@ -84,7 +84,7 @@
 	</dependencyManagement>
 
 	<scm>
-		<developerConnection>scm:git:git://github.com/CPqD/asr-sdk-java.git</developerConnection>
+		<developerConnection>scm:git:ssh://git@github.com/CPqD/asr-sdk-java.git</developerConnection>
 	</scm>
 
 	<build>
