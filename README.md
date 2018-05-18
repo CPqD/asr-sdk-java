@@ -12,6 +12,22 @@ Os códigos de exemplo estão sob o diretório [Recognizer Examples](https://git
 
 Baixe a última versão do repositório `git pull origin master` e execute `mvn clean install`.
 
+
+### Releases
+
+Para aqueles com permissão de gerar releases, o comando abaixo gera novo release no Github:
+
+```
+mvn release:prepare
+```
+
+Como ainda não há deploy dos artefatos gerados em repositório Maven, execute o comando seguinte para limpar dados gerados:
+
+```
+mvn release:clean
+```
+
+
 Licença
 -------
 
