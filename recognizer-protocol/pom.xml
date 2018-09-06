@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>br.com.cpqd.asr</groupId>
 		<artifactId>recognizer-parent</artifactId>
-		<version>2.0.1-SNAPSHOT</version>
+		<version>2.0.1</version>
 	</parent>
 
 	<artifactId>recognizer-protocol</artifactId>
