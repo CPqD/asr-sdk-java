@@ -368,13 +368,6 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 	@Override
 	public void onSpeechStop(Integer time) {
 		logger.debug("[{}] Speech stopped.", handle);
-
-		// o servidor nao esta mais ouvindo. Encerra o envio de audio
-		try {
-			this.audio.finish();
-		} catch (IOException e) {
-			logger.error("[{}] Error calling finish recognition.", this.handle, e);
-		}
 	}
 
 	@Override
@@ -390,6 +383,13 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 		if (result.isLastSpeechSegment()) {
 			synchronized (sentencesQueue) {
 				sentencesQueue.notifyAll();
+			}
+
+			// O servidor nao esta mais ouvindo. Encerra o envio de audio
+			try {
+				this.audio.finish();
+			} catch (IOException e) {
+				logger.error("[{}] Error calling finish audio.", this.handle, e);
 			}
 
 			if (builder.autoClose) {
@@ -425,7 +425,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 			try {
 				this.audio.finish();
 			} catch (IOException e) {
-				logger.error("[{}] Error calling finish recognition.", this.handle, e);
+				logger.error("[{}] Error calling finish audio.", this.handle, e);
 			}
 
 			synchronized (sentencesQueue) {
