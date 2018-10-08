@@ -18,7 +18,7 @@ Execute o comando abaixo para compilar e empacotar os exemplos:
 
         mvn clean package
 
-Para executar o exemplo `RecognizeSample` utilize o comando abaixo.
+Para executar o exemplo `RecognizeSample`, execute o comando abaixo, ajustando a versão da biblioteca.
 
-        java -cp target/recognizer-examples-1.0.0-SNAPSHOT.jar br.com.cpqd.asr.recognizer.example.RecognizeSample <URL> <lmURI> <path-to-audio> [<user> <passwd>] 
+        java -cp target/recognizer-examples-2.0.2.jar br.com.cpqd.asr.recognizer.example.RecognizeSample <URL> <lmURI> <path-to-audio> [<user> <passwd>] 
 
