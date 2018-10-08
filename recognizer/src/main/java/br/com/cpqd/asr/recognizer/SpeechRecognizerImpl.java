@@ -17,6 +17,8 @@ package br.com.cpqd.asr.recognizer;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -75,6 +77,9 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 
 	/** the asynchronous reader task. */
 	private ReaderTask readerTask;
+
+	//** Momento de recebimento do último resultado */
+	private Instant lastResultTime;
 
 	/** Status definition of the reader task. */
 	private enum ReaderTaskStatus {
@@ -303,54 +308,52 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 			return new ArrayList<>(0);
 		}
 
-		if (readerTask.isRunning()) {
-			// se o audio está sendo enviado, bloqueia a thread aguardando o fim do processo
-			while (readerTask.isRunning()) {
-				try {
-					synchronized (audio) {
-						audio.wait(3000);
-					}
-				} catch (InterruptedException e) {
-				}
-			}
-
-			if (readerTask.isCancelled()) {
-				logger.debug("Audio transfer canceled");
-				// se tarefa foi cancelada, devolve resultado vazio
-				return new ArrayList<>(0);
-			}
-		}
-
-		if (client.isOpen() && client.getStatus() != SessionStatus.IDLE) {
-			// se o servidor está processando, aguarda o recebimento do resultado
+		// se o audio está sendo enviado, bloqueia a thread aguardando o fim do processo
+		while (!readerTask.hasFinished()) {
 			try {
-				synchronized (sentencesQueue) {
-					sentencesQueue.wait(timeout * 1000);
+				synchronized (audio) {
+					audio.wait(3000);
 				}
 			} catch (InterruptedException e) {
 			}
 		}
 
-		try {
-			if (sentencesQueue.size() == 0 && error == null) {
-				logger.warn("[{}] Timeout waiting for recognition result.", this.handle);
-				for (RecognitionListener listener : client.getListeners()) {
-					listener.onError(new RecognitionError(RecognitionErrorCode.FAILURE, "Recognition timeout"));
-				}
-				throw new RecognitionException(RecognitionErrorCode.FAILURE, "Recognition timeout");
-			} else if (error != null) {
-				throw new RecognitionException(error);
-			} else {
-				List<RecognitionResult> resultList = Arrays
-						.asList(sentencesQueue.toArray(new RecognitionResult[sentencesQueue.size()]));
-				return resultList;
-			}
-
-		} finally {
-			// retorna para estado original; se houver chamadas em sequencia do
-			// metodo wait(), evita de ficar ocorrendo timeout
-			readerTask = null;
+		if (readerTask.isCancelled()) {
+			logger.debug("Audio transfer canceled");
+			// se tarefa foi cancelada, devolve resultado vazio
+			return new ArrayList<>(0);
 		}
+
+		// Espera todos os resultados chegarem
+		boolean isTimeoutWaitingResult = false;
+		while (client.isOpen() && client.getStatus() != SessionStatus.IDLE) {
+			try {
+				synchronized (sentencesQueue) {
+					sentencesQueue.wait(2000);
+				}
+				// Verifica se o timeout por resultado foi atingido
+				if (Duration.ofSeconds(timeout).minus(Duration.between(lastResultTime, Instant.now())).isNegative()) {
+					isTimeoutWaitingResult = true;
+					break;
+				}
+			} catch (InterruptedException e) {
+			}
+		}
+
+		readerTask = null;
+		
+		if (isTimeoutWaitingResult) {
+			logger.warn("[{}] Timeout waiting for recognition result.", this.handle);
+			for (RecognitionListener listener : client.getListeners()) {
+				listener.onError(new RecognitionError(RecognitionErrorCode.FAILURE, "Recognition timeout"));
+			}
+			throw new RecognitionException(RecognitionErrorCode.FAILURE, "Recognition timeout");
+		} else if (error != null) {
+			throw new RecognitionException(error);
+		} else {
+			return Arrays.asList(sentencesQueue.toArray(new RecognitionResult[sentencesQueue.size()]));
+		}
+		
 	}
 
 	@Override
@@ -375,6 +378,8 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 		logger.debug("[{}] Recognition result (last={}): {}", this.handle, result.isLastSpeechSegment(),
 				result.toString());
 
+		this.lastResultTime = Instant.now();
+		
 		if (!sentencesQueue.offer(result)) {
 			logger.warn("[{}] Messsage discarded, sentences queue is full: {}", this.handle, result);
 		}
@@ -512,6 +517,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 	private boolean startRecognition(LanguageModelList lmList, RecognitionConfig parameters)
 			throws IOException, RecognitionException {
 
+		this.lastResultTime = Instant.now();
 		StartRecognition message = new StartRecognition();
 		message.setHandle(this.handle);
 
@@ -627,6 +633,10 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 
 		public boolean isCancelled() {
 			return readerStatus == ReaderTaskStatus.CANCELED;
+		}
+		
+		public boolean hasFinished() {
+			return readerStatus != ReaderTaskStatus.IDLE && readerStatus != ReaderTaskStatus.RUNNING; 
 		}
 
 		public boolean isRunning() {
