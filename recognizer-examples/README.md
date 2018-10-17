@@ -11,7 +11,7 @@ Existem exemplos que utilizam três fontes de áudio:
 
 # Acesso ao Servidor CPqD ASR
 
-Você deve possuir acesso a uma instância do servidor de reconhecimento de fala do CPqD. A instância ASR pode estar instalada localmente ou acessível na nuvem. No último caso, é necessário possuir um usuário e credencial de acesso.
+Você deve ter acesso a uma instância do servidor de reconhecimento de fala do CPqD. A instância ASR pode estar instalada localmente ou acessível na nuvem. No último caso, é necessário possuir um usuário e credencial de acesso.
 
 # Executando os exemplos
 
@@ -19,7 +19,7 @@ Execute o comando abaixo, a partir da raiz do projeto, para compilar e empacotar
 
         mvn clean package
 
-A partir do diretório `recognizer-examples`, execute o exemplo desejado. Por exemplo, para usar `RecognizeSample`, execute o comando abaixo, ajustando a versão da biblioteca (abaixo, foi usada a verso 2.0.2):
+A partir do diretório `recognizer-examples`, execute o exemplo desejado. Por exemplo, para usar `RecognizeSample`, execute o comando abaixo, ajustando a versão da biblioteca se necessário (abaixo, foi usada a versão 2.0.2):
 
         java -cp target/recognizer-examples-2.0.2.jar br.com.cpqd.asr.recognizer.example.RecognizeSample <URL> <lmURI> <path-to-audio> [<user> <passwd>]
 
