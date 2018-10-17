@@ -19,7 +19,6 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <jackson.version>2.7.8</jackson.version>
     <javasdk.version>1.8</javasdk.version>
     <websocket.version>1.1</websocket.version>
     <junit.version>4.12</junit.version>
@@ -42,12 +41,12 @@
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
-        <version>${jackson.version}</version>
+        <version>2.9.6</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.dataformat</groupId>
         <artifactId>jackson-dataformat-xml</artifactId>
-        <version>${jackson.version}</version>
+        <version>2.9.3</version>
       </dependency>
       <dependency>
         <groupId>javax.websocket</groupId>
