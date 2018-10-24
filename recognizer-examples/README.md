@@ -27,4 +27,12 @@ O diretório `src/main/audio` oferece alguns arquivos de áudio que podem ser us
 
 Se você possui um servidor CPqD ASR local, com pacote de idioma para áudio de 8kHz e com modelo de fala livre, pode testar da seguinte forma, sem ter que passar usuário/senha de acesso:
 
-        java -cp target/recognizer-examples-2.0.2.jar br.com.cpqd.asr.recognizer.example.RecognizeSample ws://ASR_IP:8025/asr-server/asr builtin:slm/general src/main/audio/pizza-veg-8k.wav
+        java -cp target/recognizer-examples-2.0.2.jar br.com.cpqd.asr.recognizer.example.RecognizeSample ws://<ASR_IP>:8025/asr-server/asr builtin:slm/general src/main/audio/pizza-veg-8k.wav
+
+O campo <ASR_IP> deve ser substituído pelo IP do servidor CPqD ASR instalado.
+
+Se você deseja realizar transcrição de um conjunto de arquivos de áudio no formato WAV, com um servidor CPqD ASR local, pode usar a classe `BatchRecognizer`:
+
+        java -cp target/recognizer-examples-2.0.2.jar br.com.cpqd.asr.recognizer.example.BatchRecognizer ws://<ASR_IP>:8025/asr-server/asr builtin:slm/general <diretório do áudio>
+
+O campo <ASR_IP> deve ser substituído pelo IP do servidor CPqD ASR instalado.
