@@ -17,22 +17,30 @@ Você deve ter acesso a uma instância do servidor de reconhecimento de fala do 
 
 Execute o comando abaixo, a partir da raiz do projeto, para compilar e empacotar a biblioteca e os exemplos:
 
-        mvn clean package
+```
+mvn clean package
+```
 
 A partir do diretório `recognizer-examples`, execute o exemplo desejado. Por exemplo, para usar `RecognizeSample`, execute o comando abaixo, ajustando a versão da biblioteca se necessário (abaixo, foi usada a versão 2.0.2):
 
-        java -cp target/recognizer-examples-2.0.2.jar br.com.cpqd.asr.recognizer.example.RecognizeSample <URL> <lmURI> <path-to-audio> [<user> <passwd>]
+```
+java -cp target/recognizer-examples-2.0.2.jar br.com.cpqd.asr.recognizer.example.RecognizeSample <URL> <lmURI> <path-to-audio> [<user> <passwd>]
+```
 
 O diretório `src/main/audio` oferece alguns arquivos de áudio que podem ser usados para teste.
 
 Se você possui um servidor CPqD ASR local, com pacote de idioma para áudio de 8kHz e com modelo de fala livre, pode testar da seguinte forma, sem ter que passar usuário/senha de acesso:
 
-        java -cp target/recognizer-examples-2.0.2.jar br.com.cpqd.asr.recognizer.example.RecognizeSample ws://<ASR_IP>:8025/asr-server/asr builtin:slm/general src/main/audio/pizza-veg-8k.wav
+```
+java -cp target/recognizer-examples-2.0.2.jar br.com.cpqd.asr.recognizer.example.RecognizeSample ws://<ASR_IP>:8025/asr-server/asr builtin:slm/general src/main/audio/pizza-veg-8k.wav
+```
 
 O campo <ASR_IP> deve ser substituído pelo IP do servidor CPqD ASR instalado.
 
 Se você deseja realizar transcrição de um conjunto de arquivos de áudio no formato WAV, com um servidor CPqD ASR local, pode usar a classe `BatchRecognizer`:
 
-        java -cp target/recognizer-examples-2.0.2.jar br.com.cpqd.asr.recognizer.example.BatchRecognizer ws://<ASR_IP>:8025/asr-server/asr builtin:slm/general <diretório do áudio>
+```
+java -cp target/recognizer-examples-2.0.2.jar br.com.cpqd.asr.recognizer.example.BatchRecognizer ws://<ASR_IP>:8025/asr-server/asr builtin:slm/general <diretório do áudio>
+```
 
 O campo <ASR_IP> deve ser substituído pelo IP do servidor CPqD ASR instalado.
