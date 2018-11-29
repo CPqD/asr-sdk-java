@@ -41,7 +41,7 @@ public class BatchRecognizer {
 
 	public BatchRecognizer(String serverUrl, String user, String pwd)
 			throws URISyntaxException, IOException, RecognitionException {
-		RecognitionConfig config = RecognitionConfig.builder().maxSentences(1).continuousMode(true).build();
+		RecognitionConfig config = RecognitionConfig.builder().maxSentences(1).continuousMode(true).recognitionTimeoutEnabled(false).build();
 		recognizer = SpeechRecognizer.builder().serverURL(serverUrl).userAgent("client=JavaSE;app=RecognizeBatch")
 				.credentials(user, pwd).recogConfig(config)
 				.addListener(new SimpleRecognizerListener() {
