@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2018 CPqD. All Rights Reserved.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -41,7 +41,14 @@ public class BatchRecognizer {
 
 	public BatchRecognizer(String serverUrl, String user, String pwd)
 			throws URISyntaxException, IOException, RecognitionException {
-		RecognitionConfig config = RecognitionConfig.builder().maxSentences(1).continuousMode(true).recognitionTimeoutEnabled(false).build();
+
+		RecognitionConfig config = RecognitionConfig.builder()
+			.maxSentences(1)
+			.continuousMode(true)
+			.recognitionTimeoutEnabled(false)
+			.noInputTimeoutEnabled(false)
+			.build();
+
 		recognizer = SpeechRecognizer.builder().serverURL(serverUrl).userAgent("client=JavaSE;app=RecognizeBatch")
 				.credentials(user, pwd).recogConfig(config)
 				.addListener(new SimpleRecognizerListener() {
@@ -51,13 +58,12 @@ public class BatchRecognizer {
 							System.out.printf("  [%.2f - %.2f] %s%n", result.getSegmentStartTime(), result.getSegmentEndTime(), a.getText());
 						});
 					}
-				})
-				.build();
+				}).build();
 	}
 
 	/**
 	 * Reconhece um arquivo de áudio e gera um arquivo texto com a transcrição.
-	 * 
+	 *
 	 * @param audioFile Arquivo de áudio
 	 * @param lmList Lista de modelos da língua
 	 */
@@ -86,10 +92,10 @@ public class BatchRecognizer {
 
 	/**
 	 * Reconhece os áudios contidos em um diretório.
-	 * 
+	 *
 	 * @param audioPath Caminho para o diretório.
 	 * @param lmURI Modelo da língua a ser usado.
-	 * 
+	 *
 	 * @throws IOException
 	 * @throws RecognitionException
 	 */
@@ -114,7 +120,7 @@ public class BatchRecognizer {
 			throw new IOException("Audio path not found: " + audioPath);
 		}
 	}
-	
+
 	public void close() {
 		try {
 			recognizer.close();
