@@ -60,7 +60,6 @@ public class MicAudioSource implements AudioSource, LineListener {
 		}
 		this.af = format;
 		line.addLineListener(this);
-		line.open(this.af);
 	}
 
 	/**
@@ -83,15 +82,14 @@ public class MicAudioSource implements AudioSource, LineListener {
 	 */
 	@Override
 	public int read(byte[] b) throws IOException, NullPointerException {
-		synchronized (line) {
-			// se eh a primeira leitura, abre o microfone
-			if (!started) {
-				line.start();
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-				}
+		// se eh a primeira leitura, abre o microfone
+		if (!started) {
+			try {
+				line.open(this.af);
+			} catch (LineUnavailableException e) {
+				throw new IOException("Failure to read audio from microphone", e);
 			}
+			line.start();
 		}
 
 		// se o microfone nao foi fechado, faz a leitura
@@ -138,9 +136,6 @@ public class MicAudioSource implements AudioSource, LineListener {
 			// mic recording stopped
 			stopped = true;
 		} else if (event.getType().equals(LineEvent.Type.CLOSE)) {
-			// when mic if closed reset control flags
-			started = false;
-			stopped = false;
 		}
 	}
 

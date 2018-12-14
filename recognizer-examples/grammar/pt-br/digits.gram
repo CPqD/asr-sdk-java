@@ -1,0 +1,25 @@
+#ABNF 1.0 UTF-8;
+language pt-BR;
+tag-format <semantics/1.0>;
+mode voice;
+
+// ============================================================================
+// Grammar for tests
+// ============================================================================
+
+root $root;
+
+$root = {out = ""} ($digit {out += rules.latest()})<1->;
+
+$digit = zero {out = "0"} |
+         um {out = "1"} |
+         dois {out = "2"} |
+         três {out = "3"} |
+         quatro {out = "4"} |
+         cinco {out = "5"} |
+         seis {out = "6"} |
+         sete {out = "7"} |
+         oito {out = "8"} |
+         nove {out = "9"};
+
+// ============================================================================

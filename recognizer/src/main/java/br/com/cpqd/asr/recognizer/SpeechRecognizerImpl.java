@@ -103,7 +103,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 			throws URISyntaxException, IOException, RecognitionException {
 		this.builder = builder;
 
-		client = new AsrClientEndpoint(builder.uri, builder.credentials);
+		client = new AsrClientEndpoint(builder.uri, builder.username, builder.password);
 		client.getListeners().add(this);
 		if (builder.listeners.size() > 0)
 			client.getListeners().addAll(builder.listeners);
@@ -393,7 +393,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 			// O servidor nao esta mais ouvindo. Encerra o envio de audio
 			try {
 				this.audio.finish();
-			} catch (IOException e) {
+			} catch (Exception e) {
 				logger.error("[{}] Error calling finish audio.", this.handle, e);
 			}
 
@@ -429,7 +429,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 			// o servidor nao esta mais ouvindo. Encerra o envio de audio
 			try {
 				this.audio.finish();
-			} catch (IOException e) {
+			} catch (Exception e) {
 				logger.error("[{}] Error calling finish audio.", this.handle, e);
 			}
 

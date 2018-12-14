@@ -108,7 +108,7 @@ public class AsrClientEndpoint {
 	 * @throws URISyntaxException
 	 *             invalid server URL (e.g: 'ws://127.0.0.1:8025/asr-server/asr').
 	 */
-	public AsrClientEndpoint(URI uri, String[] credentials) throws URISyntaxException {
+	public AsrClientEndpoint(URI uri, String username, String password) throws URISyntaxException {
 		if (uri == null) {
 			throw new NullPointerException("Server URI cannot be null");
 		} else if (uri.getScheme() == null) {
@@ -151,11 +151,11 @@ public class AsrClientEndpoint {
 			clientManager.getProperties().put(ClientProperties.SSL_ENGINE_CONFIGURATOR, sslEngineConfigurator);
 		}
 
-		if (credentials != null && credentials.length == 2) {
+		if (username != null && password != null) {
 			AuthConfig authConfig = AuthConfig.Builder.create().build();
 			clientManager.getProperties().put(ClientProperties.AUTH_CONFIG, authConfig);
 			clientManager.getProperties().put(ClientProperties.CREDENTIALS,
-					new Credentials(credentials[0], credentials[1].getBytes()));
+					new Credentials(username, password.getBytes()));
 		}
 	}
 
@@ -351,7 +351,7 @@ public class AsrClientEndpoint {
 						w.setEndTime(word.getEndTime());
 						w.setStartTime(word.getStartTime());
 						w.setWord(word.getText());
-						alt.getWordAlignment().add(w);
+						alt.getWords().add(w);
 					}
 
 					aResult.getAlternatives().add(alt);

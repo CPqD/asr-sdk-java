@@ -52,7 +52,8 @@ public class RecognitionParameters {
 		endpointerLevelThreshold("endpointer.levelThreshold"), 
 		endpointerLevelMode("endpointer.levelMode"), 
 		endpointerAutoLevelLen("endpointer.autoLevelLen"), 
-		decoderConfidenceThreshold("decoder.confidenceThreshold");
+		decoderConfidenceThreshold("decoder.confidenceThreshold"),
+		decoderContinuousMode("decoder.continuousMode");
 
 		/** valor do header na comunicação websocket. */
 		private String header;

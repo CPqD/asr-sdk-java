@@ -35,6 +35,9 @@ import br.com.cpqd.asr.recognizer.model.RecognitionAlternative;
 import br.com.cpqd.asr.recognizer.model.RecognitionConfig;
 import br.com.cpqd.asr.recognizer.model.RecognitionResult;
 
+/**
+ * Example of speech recognizer for a batch of audio files.
+ */
 public class BatchRecognizer {
 
 	private SpeechRecognizer recognizer;
@@ -49,7 +52,7 @@ public class BatchRecognizer {
 			.noInputTimeoutEnabled(false)
 			.build();
 
-		recognizer = SpeechRecognizer.builder().serverURL(serverUrl).userAgent("client=JavaSE;app=RecognizeBatch")
+		recognizer = SpeechRecognizer.builder().serverURL(serverUrl).userAgent("client=JavaSE;app=BatchRecognizer")
 				.credentials(user, pwd).recogConfig(config)
 				.addListener(new SimpleRecognizerListener() {
 					@Override
@@ -62,10 +65,10 @@ public class BatchRecognizer {
 	}
 
 	/**
-	 * Reconhece um arquivo de áudio e gera um arquivo texto com a transcrição.
+	 * Recognize a single audio file and generates a text file containing its transcription. 
 	 *
-	 * @param audioFile Arquivo de áudio
-	 * @param lmList Lista de modelos da língua
+	 * @param audioFile Audio file to recognize
+	 * @param lmList Language model list
 	 */
 	private void recognizeFile(File audioFile, LanguageModelList lmList) {
 		try (BufferedWriter textFile = Files.newBufferedWriter(Paths.get(audioFile.getAbsolutePath() + ".txt"))) {
@@ -91,10 +94,10 @@ public class BatchRecognizer {
 	}
 
 	/**
-	 * Reconhece os áudios contidos em um diretório.
+	 * Transcribe a list of audio files in a directory
 	 *
-	 * @param audioPath Caminho para o diretório.
-	 * @param lmURI Modelo da língua a ser usado.
+	 * @param audioPath Path to files.
+	 * @param lmURI Language model to use.
 	 *
 	 * @throws IOException
 	 * @throws RecognitionException
@@ -132,25 +135,16 @@ public class BatchRecognizer {
 
 	public static void main(String[] args) throws IOException, URISyntaxException, RecognitionException {
 
-		if (!(args.length == 3 || args.length == 5)) {
-			System.out.println("Usage: <ws_url> <lang_uri> <wav_path> [ <user> <password> ]");
-			System.out
-					.println("  eg: wss://path/to/server builtin:slm/general /path/to/dir myusername mypassword");
+		ProgramArguments pa = ProgramArguments.from(args);
+
+		if (args.length == 0) {
+			System.err.println("Usage: BatchRecognizer --server <Server URL> --lm <LM URI> --audio <Audio Path> [--user <username> --pwd <password>]");
+			System.err.println(" e.g.: BatchRecognizer --server ws://127.0.0.1:8025/asr-server/asr --lm builtin:slm/general --audio audio/pt-br/87431_8k.wav");
 			return;
 		}
-
-		String url = args[0];
-		String lmURI = args[1];
-		String audioPath = args[2];
-		String user = null;
-		String pwd = null;
-		if (args.length > 3) {
-			user = args[3];
-			pwd = args[4];
-		}
-
-		BatchRecognizer recognizer = new BatchRecognizer(url, user, pwd);
-		recognizer.recognize(audioPath, lmURI);
+		
+		BatchRecognizer recognizer = new BatchRecognizer(pa.getArg("server"), pa.getArg("user"), pa.getArg("pwd"));
+		recognizer.recognize(pa.getArg("audio"), pa.getArg("lm"));
 		recognizer.close();
 	}
 

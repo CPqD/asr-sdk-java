@@ -38,7 +38,7 @@ public class RecognitionAlternative {
 	private List<Interpretation> interpretations = new ArrayList<>();
 
 	/** the word alignment list. */
-	private List<Word> wordAlignment = new ArrayList<>();
+	private List<Word> words = new ArrayList<>();
 
 	public String getLanguageModel() {
 		return languageModel;
@@ -72,18 +72,18 @@ public class RecognitionAlternative {
 		this.interpretations = interpretations;
 	}
 
-	public List<Word> getWordAlignment() {
-		return wordAlignment;
+	public List<Word> getWords() {
+		return words;
 	}
 
-	public void setWordAlignment(List<Word> wordAlignment) {
-		this.wordAlignment = wordAlignment;
+	public void setWords(List<Word> wordAlignment) {
+		this.words = wordAlignment;
 	}
 
 	@Override
 	public String toString() {
 		return "RecognitionAlternative [lm=" + languageModel + ", text=" + text + ", confidence=" + confidence
-				+ ", interpretations=" + interpretations + ", wordAlignment=" + wordAlignment + "]";
+				+ ", interpretations=" + interpretations + ", words=" + words + "]";
 	}
 
 }

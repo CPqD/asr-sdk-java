@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import br.com.cpqd.asr.recognizer.model.RecognitionConfig;
@@ -135,7 +134,8 @@ public interface SpeechRecognizer {
 		protected String userAgent;
 
 		/** User access credentials. */
-		protected String[] credentials;
+		protected String username;
+		protected String password;
 
 		/** The recognition configuration parameters. */
 		protected RecognitionConfig recogConfig;
@@ -223,15 +223,17 @@ public interface SpeechRecognizer {
 		/**
 		 * Sets user access credentials, if required by the server.
 		 * 
-		 * @param user
+		 * @param username
 		 *            user id.
-		 * @param passwd
+		 * @param password
 		 *            password.
 		 * @return the Builder object.
 		 */
-		public SpeechRecognizer.Builder credentials(String user, String passwd) {
-			if (user != null && passwd != null)
-				this.credentials = Arrays.asList(user, passwd).toArray(new String[2]);
+		public SpeechRecognizer.Builder credentials(String username, String password) {
+			if (username != null && password != null) {
+				this.username = username;
+				this.password = password;
+			}
 			return this;
 		}
 
