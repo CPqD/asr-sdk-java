@@ -1,15 +1,12 @@
 package br.com.cpqd.asr.recognizer.example;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Properties;
 
 public class ProgramArguments {
 
-	private Map<String, String> arguments = new HashMap<>();
+	public static Properties parseFrom(String[] args) {
 
-	public static ProgramArguments from(String[] args) {
-
-		ProgramArguments pa = new ProgramArguments();
+		Properties arguments = new Properties();
 
 		String name = null;
 		for (String arg : args) {
@@ -20,21 +17,12 @@ public class ProgramArguments {
 					throw new RuntimeException("Invalid argument: " + arg);
 				}
 			} else {
-				pa.arguments.put(name, arg);
+				arguments.put(name, arg);
 				name = null;
 			}
 		}
 		
-		return pa;
-	}
-
-	public String getArg(String name) {
-		return arguments.get(name);
-	}
-	
-	@Override
-	public String toString() {
-		return "Arguments[" + arguments.toString() + "]";
+		return arguments;
 	}
 
 }

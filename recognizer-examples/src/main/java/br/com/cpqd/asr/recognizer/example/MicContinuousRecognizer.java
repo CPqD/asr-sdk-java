@@ -19,6 +19,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
+import java.util.Properties;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.LineUnavailableException;
@@ -44,7 +45,7 @@ public class MicContinuousRecognizer {
 	public static void main(String[] args) throws DeploymentException, IOException, URISyntaxException,
 			RecognitionException, LineUnavailableException {
 		
-		ProgramArguments pa = ProgramArguments.from(args);
+		Properties pa = ProgramArguments.parseFrom(args);
 
 		if (args.length == 0) {
 			System.err.println("Usage: MicContinuousRecognizer --server <Server URL> --lm <LM URI> [--user <username> --pwd <password>]");
@@ -60,11 +61,11 @@ public class MicContinuousRecognizer {
 				.confidenceThreshold(70).build();
 
 		MicAudioSource audio = new MicAudioSource(new AudioFormat(8000F, 16, 1, true, false));
-		LanguageModelList lm = LanguageModelList.builder().addFromURI(pa.getArg("lm")).build();
+		LanguageModelList lm = LanguageModelList.builder().addFromURI(pa.getProperty("lm")).build();
 		
 		SpeechRecognizer asr = SpeechRecognizer.builder()
-				.serverURL(pa.getArg("server"))
-				.credentials(pa.getArg("user"), pa.getArg("pwd"))
+				.serverURL(pa.getProperty("server"))
+				.credentials(pa.getProperty("user"), pa.getProperty("pwd"))
 				.recogConfig(config)
 				.addListener(new SimpleRecognizerListener() {
 					@Override

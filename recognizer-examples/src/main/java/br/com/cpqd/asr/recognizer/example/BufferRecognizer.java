@@ -16,6 +16,7 @@
 package br.com.cpqd.asr.recognizer.example;
 
 import java.io.FileInputStream;
+import java.util.Properties;
 
 import br.com.cpqd.asr.recognizer.BufferAudioSource;
 import br.com.cpqd.asr.recognizer.LanguageModelList;
@@ -35,7 +36,7 @@ public class BufferRecognizer {
 
 	public static void main(String[] args) throws Exception {
 
-		ProgramArguments pa = ProgramArguments.from(args);
+		Properties pa = ProgramArguments.parseFrom(args);
 
 		if (args.length == 0) {
 			System.err.println("Usage: BufferRecognizer --server <Server URL> --lm <LM URI> --audio <Audio Path> [--user <username> --pwd <password>]");
@@ -44,17 +45,17 @@ public class BufferRecognizer {
 		}
 		
 		RecognitionConfig config = RecognitionConfig.builder().maxSentences(1).confidenceThreshold(70).build();
-		LanguageModelList lm = LanguageModelList.builder().addFromURI(pa.getArg("lm")).build();
+		LanguageModelList lm = LanguageModelList.builder().addFromURI(pa.getProperty("lm")).build();
 		SpeechRecognizer asr = SpeechRecognizer.builder()
-				.serverURL(pa.getArg("server"))
-				.credentials(pa.getArg("user"), pa.getArg("pwd"))
+				.serverURL(pa.getProperty("server"))
+				.credentials(pa.getProperty("user"), pa.getProperty("pwd"))
 				.recogConfig(config).build();
 
 		// cria um objeto BufferAudioSource para receber os bytes de audio
 		BufferAudioSource audio = new BufferAudioSource();
 		
 		// Usando outra thead para enviar o áudio para o ASR
-		ReadAudioThread thread = new ReadAudioThread(audio, pa.getArg("audio"));
+		ReadAudioThread thread = new ReadAudioThread(audio, pa.getProperty("audio"));
 		thread.start();
 		
 		try {

@@ -23,6 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Properties;
 import java.util.stream.Stream;
 
 import br.com.cpqd.asr.recognizer.AudioSource;
@@ -42,14 +43,21 @@ public class BatchRecognizer {
 
 	private SpeechRecognizer recognizer;
 
-	public BatchRecognizer(String serverUrl, String user, String pwd)
+	public BatchRecognizer(Properties pa)
 			throws URISyntaxException, IOException, RecognitionException {
 
+		String serverUrl = pa.getProperty("server");
+		String user = pa.getProperty("user");
+		String pwd = pa.getProperty("pwd");
+		
 		RecognitionConfig config = RecognitionConfig.builder()
 			.maxSentences(1)
 			.continuousMode(true)
 			.recognitionTimeoutEnabled(false)
 			.noInputTimeoutEnabled(false)
+			.endPointerLevelThreshold(Integer.parseInt(pa.getProperty("endpointer.levelThreshold", "2")))
+			.confidenceThreshold(Integer.parseInt(pa.getProperty("decoder.confidenceThreshold", "30")))
+			.waitEndMilis(Integer.parseInt(pa.getProperty("endpointer.waitEnd", "2000")))
 			.build();
 
 		recognizer = SpeechRecognizer.builder().serverURL(serverUrl).userAgent("client=JavaSE;app=BatchRecognizer")
@@ -135,7 +143,7 @@ public class BatchRecognizer {
 
 	public static void main(String[] args) throws IOException, URISyntaxException, RecognitionException {
 
-		ProgramArguments pa = ProgramArguments.from(args);
+		Properties pa = ProgramArguments.parseFrom(args);
 
 		if (args.length == 0) {
 			System.err.println("Usage: BatchRecognizer --server <Server URL> --lm <LM URI> --audio <Audio Path> [--user <username> --pwd <password>]");
@@ -143,8 +151,8 @@ public class BatchRecognizer {
 			return;
 		}
 		
-		BatchRecognizer recognizer = new BatchRecognizer(pa.getArg("server"), pa.getArg("user"), pa.getArg("pwd"));
-		recognizer.recognize(pa.getArg("audio"), pa.getArg("lm"));
+		BatchRecognizer recognizer = new BatchRecognizer(pa);
+		recognizer.recognize(pa.getProperty("audio"), pa.getProperty("lm"));
 		recognizer.close();
 	}
 

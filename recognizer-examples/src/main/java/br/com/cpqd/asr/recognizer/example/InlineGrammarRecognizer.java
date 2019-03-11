@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Properties;
 
 import javax.websocket.DeploymentException;
 
@@ -47,14 +48,14 @@ public class InlineGrammarRecognizer {
 			return;
 		}
 
-		ProgramArguments pa = ProgramArguments.from(args);
+		Properties pa = ProgramArguments.parseFrom(args);
 		
 		RecognitionConfig config = RecognitionConfig.builder().maxSentences(1).confidenceThreshold(70).build();
-		System.out.println(pa.getArg("audio"));
-		AudioSource audio = new FileAudioSource(new File(pa.getArg("audio")));
-		String grammarBody = new String(Files.readAllBytes(Paths.get(pa.getArg("lm"))));
+		System.out.println(pa.getProperty("audio"));
+		AudioSource audio = new FileAudioSource(new File(pa.getProperty("audio")));
+		String grammarBody = new String(Files.readAllBytes(Paths.get(pa.getProperty("lm"))));
 		LanguageModelList lm = LanguageModelList.builder().addInlineGrammar("mygram", grammarBody).build();
-		SpeechRecognizer asr = SpeechRecognizer.builder().serverURL(pa.getArg("server")).credentials(pa.getArg("user"), pa.getArg("pwd")).recogConfig(config).build();
+		SpeechRecognizer asr = SpeechRecognizer.builder().serverURL(pa.getProperty("server")).credentials(pa.getProperty("user"), pa.getProperty("pwd")).recogConfig(config).build();
 
 		try {
 			asr.recognize(audio, lm);

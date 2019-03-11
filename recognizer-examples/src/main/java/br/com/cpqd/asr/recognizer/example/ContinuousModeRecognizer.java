@@ -16,6 +16,7 @@
 package br.com.cpqd.asr.recognizer.example;
 
 import java.io.File;
+import java.util.Properties;
 
 import br.com.cpqd.asr.recognizer.AudioSource;
 import br.com.cpqd.asr.recognizer.FileAudioSource;
@@ -32,7 +33,7 @@ public class ContinuousModeRecognizer {
 
 	public static void main(String[] args) throws Exception {
 
-		ProgramArguments pa = ProgramArguments.from(args);
+		Properties pa = ProgramArguments.parseFrom(args);
 
 		if (args.length == 0) {
 			System.err.println("Usage: ContinuousModeRecognizer --server <Server URL> --lm <LM URI> --audio <Audio Path> [--user <username> --pwd <password>]");
@@ -45,14 +46,15 @@ public class ContinuousModeRecognizer {
 				.continuousMode(true)
 				.noInputTimeoutEnabled(false)
 				.recognitionTimeoutEnabled(false)
+				.endPointerLevelThreshold(Integer.parseInt(pa.getProperty("endpointer.levelThreshold", "2")))
 				.confidenceThreshold(70).build();
 
-		AudioSource audio = new FileAudioSource(new File(pa.getArg("audio")));
-		LanguageModelList lm = LanguageModelList.builder().addFromURI(pa.getArg("lm")).build();
+		AudioSource audio = new FileAudioSource(new File(pa.getProperty("audio")));
+		LanguageModelList lm = LanguageModelList.builder().addFromURI(pa.getProperty("lm")).build();
 
 		SpeechRecognizer asr = SpeechRecognizer.builder()
-				.serverURL(pa.getArg("server"))
-				.credentials(pa.getArg("user"), pa.getArg("pwd")).recogConfig(config)
+				.serverURL(pa.getProperty("server"))
+				.credentials(pa.getProperty("user"), pa.getProperty("pwd")).recogConfig(config)
 				.addListener(new SimpleRecognizerListener() {
 					@Override
 					public void onRecognitionResult(RecognitionResult result) {

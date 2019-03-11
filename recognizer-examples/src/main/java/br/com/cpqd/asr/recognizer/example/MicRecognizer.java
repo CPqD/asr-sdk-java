@@ -19,6 +19,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
+import java.util.Properties;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.LineUnavailableException;
@@ -50,15 +51,15 @@ public class MicRecognizer {
 			return;
 		}
 		
-		ProgramArguments pa = ProgramArguments.from(args);
+		Properties pa = ProgramArguments.parseFrom(args);
 		
 		RecognitionConfig config = RecognitionConfig.builder().maxSentences(1).confidenceThreshold(70).build();
 		MicAudioSource audio = new MicAudioSource(new AudioFormat(8000F, 16, 1, true, false));
-		LanguageModelList lm = LanguageModelList.builder().addFromURI(pa.getArg("lm")).build();
+		LanguageModelList lm = LanguageModelList.builder().addFromURI(pa.getProperty("lm")).build();
 		
 		SpeechRecognizer asr = SpeechRecognizer.builder()
-				.serverURL(pa.getArg("server"))
-				.credentials(pa.getArg("user"), pa.getArg("pwd"))
+				.serverURL(pa.getProperty("server"))
+				.credentials(pa.getProperty("user"), pa.getProperty("pwd"))
 				.addListener(new SimpleRecognizerListener() {
 					@Override
 					public void onSpeechStart(Integer time) {
