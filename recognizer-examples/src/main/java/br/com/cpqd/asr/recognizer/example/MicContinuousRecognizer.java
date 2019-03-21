@@ -56,9 +56,12 @@ public class MicContinuousRecognizer {
 		RecognitionConfig config = RecognitionConfig.builder()
 				.maxSentences(1)
 				.continuousMode(true)
-				.noInputTimeoutEnabled(false)
 				.recognitionTimeoutEnabled(false)
-				.confidenceThreshold(70).build();
+				.noInputTimeoutEnabled(false)
+				.endPointerLevelThreshold(Integer.parseInt(pa.getProperty("endpointer.levelThreshold", "10")))
+				.confidenceThreshold(Integer.parseInt(pa.getProperty("decoder.confidenceThreshold", "70")))
+				.waitEndMilis(Integer.parseInt(pa.getProperty("endpointer.waitEnd", "1000")))
+				.build();
 
 		MicAudioSource audio = new MicAudioSource(new AudioFormat(8000F, 16, 1, true, false));
 		LanguageModelList lm = LanguageModelList.builder().addFromURI(pa.getProperty("lm")).build();
@@ -72,6 +75,10 @@ public class MicContinuousRecognizer {
 					public void onRecognitionResult(RecognitionResult result) {
 						result.getAlternatives().stream().findFirst().ifPresent(a -> {
 							System.out.printf("  [%.2f - %.2f][%d] %s%n", result.getSegmentStartTime(), result.getSegmentEndTime(), a.getConfidence(), a.getText());
+							a.getInterpretations().stream().findFirst().ifPresent(si -> {
+								System.out.printf("  >> Interpretation: %s%n", si.getInterpretation());
+							});
+							System.out.println();
 						});
 					}
 				}).build();
@@ -84,10 +91,10 @@ public class MicContinuousRecognizer {
 			
 			asr.recognize(audio, lm);
 			
-			System.err.println("Recogniztion started");
+			System.err.println("Recognition started");
 			keyboardReader.readLine();
 			audio.finish();
-			System.err.println("Recogniztion stopped");
+			System.err.println("Recognition stopped");
 		} catch(Exception e) {
 			e.printStackTrace();
 		} finally {

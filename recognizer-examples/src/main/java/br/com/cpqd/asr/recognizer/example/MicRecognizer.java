@@ -79,7 +79,7 @@ public class MicRecognizer {
 			System.out.println("Press <ENTER> to start recording...");
 			keyboardReader.readLine();
 			asr.recognize(audio, lm);
-			System.err.println("Recogniztion started");
+			System.err.println("Recognition started");
 
 			RecognitionResult result = asr.waitRecognitionResult().get(0);
 			
