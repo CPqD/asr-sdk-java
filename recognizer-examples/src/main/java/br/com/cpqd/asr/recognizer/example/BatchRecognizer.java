@@ -32,7 +32,6 @@ import br.com.cpqd.asr.recognizer.LanguageModelList;
 import br.com.cpqd.asr.recognizer.RecognitionException;
 import br.com.cpqd.asr.recognizer.SimpleRecognizerListener;
 import br.com.cpqd.asr.recognizer.SpeechRecognizer;
-import br.com.cpqd.asr.recognizer.model.RecognitionAlternative;
 import br.com.cpqd.asr.recognizer.model.RecognitionConfig;
 import br.com.cpqd.asr.recognizer.model.RecognitionResult;
 
@@ -66,7 +65,7 @@ public class BatchRecognizer {
 					@Override
 					public void onRecognitionResult(RecognitionResult result) {
 						result.getAlternatives().stream().findFirst().ifPresent(a -> {
-							System.out.printf("  [%.2f - %.2f] %s%n", result.getSegmentStartTime(), result.getSegmentEndTime(), a.getText());
+							System.out.printf("  [%.2f - %.2f][%d] %s%n", result.getSegmentStartTime(), result.getSegmentEndTime(), a.getConfidence(), a.getText());
 						});
 					}
 				}).build();
