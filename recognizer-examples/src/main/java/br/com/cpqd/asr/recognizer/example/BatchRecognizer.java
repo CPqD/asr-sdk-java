@@ -32,6 +32,7 @@ import br.com.cpqd.asr.recognizer.LanguageModelList;
 import br.com.cpqd.asr.recognizer.RecognitionException;
 import br.com.cpqd.asr.recognizer.SimpleRecognizerListener;
 import br.com.cpqd.asr.recognizer.SpeechRecognizer;
+import br.com.cpqd.asr.recognizer.model.RecognitionAlternative;
 import br.com.cpqd.asr.recognizer.model.RecognitionConfig;
 import br.com.cpqd.asr.recognizer.model.RecognitionResult;
 
