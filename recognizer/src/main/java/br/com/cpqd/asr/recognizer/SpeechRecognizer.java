@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2017 CPqD. All Rights Reserved.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -33,7 +33,7 @@ public interface SpeechRecognizer {
 
 	/**
 	 * Release resources and close the server connection.
-	 * 
+	 *
 	 * @throws IOException
 	 *             some sort of I/O exception has ocurred.
 	 */
@@ -41,7 +41,7 @@ public interface SpeechRecognizer {
 
 	/**
 	 * Cancels the current recognition, closing the audio source.
-	 * 
+	 *
 	 * @throws IOException
 	 *             some sort of I/O exception has ocurred.
 	 * @throws RecognitionException
@@ -54,12 +54,12 @@ public interface SpeechRecognizer {
 	 * be created previously. The recognition result will be notified in the
 	 * registered AsrListener callbacks. The audio source is automatically
 	 * closed after the end of the recognition process.
-	 * 
+	 *
 	 * @param lmList
 	 *            the language model to use.
 	 * @param audio
 	 *            audio source.
-	 * 
+	 *
 	 * @throws IOException
 	 *             some sort of I/O exception has ocurred.
 	 * @throws RecognitionException
@@ -72,14 +72,14 @@ public interface SpeechRecognizer {
 	 * be created previously. The recognition result will be notified in the
 	 * registered AsrListener callbacks. The audio source is automatically
 	 * closed after the end of the recognition process.
-	 * 
+	 *
 	 * @param lmList
 	 *            the language model to use.
 	 * @param audio
 	 *            audio source.
 	 * @param config
 	 *            recognition configuration parameters.
-	 * 
+	 *
 	 * @throws IOException
 	 *             some sort of I/O exception has ocurred.
 	 * @throws RecognitionException
@@ -92,7 +92,7 @@ public interface SpeechRecognizer {
 	 * Returns the recognition result. If audio packets are still being sent to
 	 * the server, the method blocks and waits for the end of the recognition
 	 * process.
-	 * 
+	 *
 	 * @return the recognition result or null if there is no result available.
 	 * @throws RecognitionException
 	 *             in case an error in the recognition occurs.
@@ -102,7 +102,7 @@ public interface SpeechRecognizer {
 	/**
 	 * Returns the recognition result. If audio packets are still being sent to the
 	 * server, the method blocks and waits for the end of the recognition process.
-	 * 
+	 *
 	 * @param timeout
 	 *            the max wait time for a recognition result (in seconds). The timer
 	 *            is started after the last audio packet is sent.
@@ -114,7 +114,7 @@ public interface SpeechRecognizer {
 
 	/**
 	 * Creates a new instance of the object builder.
-	 * 
+	 *
 	 * @return the Builder object.
 	 */
 	static SpeechRecognizer.Builder builder() {
@@ -179,7 +179,7 @@ public interface SpeechRecognizer {
 
 		/**
 		 * Private constructor. Defines default configuration parameters.
-		 * 
+		 *
 		 */
 		protected Builder() {
 			this.audioSampleRate = 8000;
@@ -192,7 +192,7 @@ public interface SpeechRecognizer {
 
 		/**
 		 * Builds an SpeechRecognizer instance.
-		 * 
+		 *
 		 * @return the recognizer instance.
 		 * @throws URISyntaxException
 		 *             if there is an error with the server URL parameter.
@@ -208,12 +208,13 @@ public interface SpeechRecognizer {
 
 		/**
 		 * Defines the Server URL.
-		 * 
+		 *
 		 * @param url
 		 *            the ASR Server endpoint URL (e.g.:
 		 *            ws://192.168.100.1:8025/asr-server).
 		 * @return the Builder object
-		 * @throws URISyntaxException 
+		 *
+		 * @throws URISyntaxException Invalid URL
 		 */
 		public SpeechRecognizer.Builder serverURL(String url) throws URISyntaxException {
 			this.uri = new URI(url);
@@ -222,7 +223,7 @@ public interface SpeechRecognizer {
 
 		/**
 		 * Sets user access credentials, if required by the server.
-		 * 
+		 *
 		 * @param username
 		 *            user id.
 		 * @param password
@@ -239,7 +240,7 @@ public interface SpeechRecognizer {
 
 		/**
 		 * Configure the recognition parameters.
-		 * 
+		 *
 		 * @param recogConfig
 		 *            the configuration parameters.
 		 * @return the Builder object.
@@ -251,7 +252,7 @@ public interface SpeechRecognizer {
 
 		/**
 		 * Register a call back listener interface.
-		 * 
+		 *
 		 * @param listener
 		 *            the listener object.
 		 * @return the Builder object.
@@ -264,7 +265,7 @@ public interface SpeechRecognizer {
 		/**
 		 * Sets the user agent data. This information indicates the
 		 * characteristics of the client for logging and debug purposes.
-		 * 
+		 *
 		 * @param userAgent
 		 *            the user agent data.
 		 * @return the Builder object.
@@ -276,7 +277,7 @@ public interface SpeechRecognizer {
 
 		/**
 		 * Sets the maximum time the client waits for the recognition result.
-		 * 
+		 *
 		 * @param timeout
 		 *            the timeout value (in seconds).
 		 * @return the Builder object.
@@ -290,7 +291,7 @@ public interface SpeechRecognizer {
 		 * Sets the connect on recognize property. If set to true, the ASR
 		 * session is automatically created at each recognition. Otherwise, it
 		 * is created when the SpeechRecognizer is built.
-		 * 
+		 *
 		 * @param connectOnRecognize
 		 *            the connectOnRecognize property value.
 		 * @return the Builder object.
@@ -304,7 +305,7 @@ public interface SpeechRecognizer {
 		 * Sets the auto close property. If set to true, the ASR session is
 		 * automatically closed at the end of each recognition. Otherwise, it is
 		 * kept open for the next recognition.
-		 * 
+		 *
 		 * @param autoClose
 		 *            the autoClose property value.
 		 * @return the Builder object.
@@ -316,7 +317,7 @@ public interface SpeechRecognizer {
 
 		/**
 		 * Sets the maximum session idle time.
-		 * 
+		 *
 		 * @param maxSessionIdleSeconds
 		 *            the max session idle time in seconds.
 		 * @return the Builder object.
@@ -328,7 +329,7 @@ public interface SpeechRecognizer {
 
 		/**
 		 * Sets the audio sample rate (in bps).
-		 * 
+		 *
 		 * @param sampleRate
 		 *            the audio sample rate.
 		 * @return the Builder object.
@@ -341,7 +342,7 @@ public interface SpeechRecognizer {
 
 		/**
 		 * Sets the audio encoding.
-		 * 
+		 *
 		 * @param encoding
 		 *            the audio encoding.
 		 * @return the Builder object.
@@ -354,7 +355,7 @@ public interface SpeechRecognizer {
 
 		/**
 		 * Sets the audio language.
-		 * 
+		 *
 		 * @param language
 		 *            the audio language.
 		 * @return the Builder object.

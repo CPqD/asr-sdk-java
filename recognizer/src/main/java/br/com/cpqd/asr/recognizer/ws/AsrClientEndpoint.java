@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2018 CPqD. All Rights Reserved.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -73,7 +73,7 @@ import br.com.cpqd.asr.recognizer.model.Word;
 
 /**
  * Websocket endpoint (JSR 356) for communicating with the ASR server.
- * 
+ *
  */
 @ClientEndpoint(decoders = { AsrProtocolEncoder.class }, encoders = { AsrProtocolEncoder.class })
 public class AsrClientEndpoint {
@@ -102,9 +102,14 @@ public class AsrClientEndpoint {
 
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param uri
 	 *            the websocket server endpoint URI.
+	 * @param username
+	 *            Username to have access to API.
+	 * @param password
+	 *            Password to have access to API.
+	 *
 	 * @throws URISyntaxException
 	 *             invalid server URL (e.g: 'ws://127.0.0.1:8025/asr-server/asr').
 	 */
@@ -161,7 +166,7 @@ public class AsrClientEndpoint {
 
 	/**
 	 * Opens a websocket connection with the server.
-	 * 
+	 *
 	 * @throws IOException
 	 *             some sort of I/O exception has ocurred.
 	 * @throws DeploymentException
@@ -174,7 +179,7 @@ public class AsrClientEndpoint {
 
 	/**
 	 * Returns the registered listeners for protocol events.
-	 * 
+	 *
 	 * @return the registered listeners.
 	 */
 	public List<RecognitionListener> getListeners() {
@@ -183,7 +188,7 @@ public class AsrClientEndpoint {
 
 	/**
 	 * Verifies if the server connection is open.
-	 * 
+	 *
 	 * @return true if the connection is open.
 	 */
 	public boolean isOpen() {
@@ -211,7 +216,7 @@ public class AsrClientEndpoint {
 	/**
 	 * Send a binary message to the server, via websocket connection, and wait for
 	 * the server response.
-	 * 
+	 *
 	 * @param message
 	 *            the protocol message object.
 	 * @return the response message.
@@ -233,7 +238,7 @@ public class AsrClientEndpoint {
 
 	/**
 	 * Send a binary message to the server, via websocket connection.
-	 * 
+	 *
 	 * @param message
 	 *            the protocol message object.
 	 * @throws IOException
@@ -247,7 +252,7 @@ public class AsrClientEndpoint {
 
 	/**
 	 * Call back method called when the websocket connection is opened.
-	 * 
+	 *
 	 * @param session
 	 *            the websocket session.
 	 */
@@ -259,7 +264,7 @@ public class AsrClientEndpoint {
 
 	/**
 	 * Call back method called when the websocket connection is closed.
-	 * 
+	 *
 	 * @param session
 	 *            the websocket session.
 	 * @param closeReason
@@ -295,7 +300,7 @@ public class AsrClientEndpoint {
 
 	/**
 	 * Call back method called when a protocol message is received.
-	 * 
+	 *
 	 * @param message
 	 *            the protocol message.
 	 * @param session
@@ -445,7 +450,7 @@ public class AsrClientEndpoint {
 
 	/**
 	 * Returns the websocket session id.
-	 * 
+	 *
 	 * @return the websocket session id.
 	 */
 	public String getSessionId() {
@@ -457,7 +462,7 @@ public class AsrClientEndpoint {
 
 	/**
 	 * Returns the recognition session status.
-	 * 
+	 *
 	 * @return the recognition session status.
 	 */
 	public SessionStatus getStatus() {
