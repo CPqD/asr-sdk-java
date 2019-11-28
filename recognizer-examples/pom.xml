@@ -6,7 +6,7 @@
 
 	<groupId>br.com.cpqd.asr</groupId>
 	<artifactId>recognizer-examples</artifactId>
-	<version>2.0.7</version>
+	<version>2.0.8-SNAPSHOT</version>
 	<name>Java Recognizer Examples</name>
 	<packaging>jar</packaging>
 	<description>Code example to use CPqD ASR with the Java SDK</description>
@@ -20,7 +20,7 @@
 		<dependency>
 			<groupId>br.com.cpqd.asr</groupId>
 			<artifactId>recognizer</artifactId>
-			<version>2.0.7</version>
+			<version>2.0.8-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
