@@ -58,6 +58,7 @@ public class BatchRecognizer {
 			.endPointerLevelThreshold(Integer.parseInt(pa.getProperty("endpointer.levelThreshold", "2")))
 			.confidenceThreshold(Integer.parseInt(pa.getProperty("decoder.confidenceThreshold", "30")))
 			.waitEndMilis(Integer.parseInt(pa.getProperty("endpointer.waitEnd", "2000")))
+			.loggingTag("app=BatchRecognizer")
 			.build();
 
 		recognizer = SpeechRecognizer.builder().serverURL(serverUrl).userAgent("client=JavaSE;app=BatchRecognizer")

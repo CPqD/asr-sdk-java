@@ -18,8 +18,6 @@ package br.com.cpqd.asr.recognizer;
 import java.io.IOException;
 import java.io.InputStream;
 
-import br.com.cpqd.asr.recognizer.AudioSource;
-
 /**
  * AudioSource implementation for a generic InputStream source.
  * 

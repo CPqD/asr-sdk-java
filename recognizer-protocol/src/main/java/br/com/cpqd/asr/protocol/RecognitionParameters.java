@@ -51,9 +51,18 @@ public class RecognitionParameters {
 		endpointerWaitEnd("endpointer.waitEnd"), 
 		endpointerLevelThreshold("endpointer.levelThreshold"), 
 		endpointerLevelMode("endpointer.levelMode"), 
-		endpointerAutoLevelLen("endpointer.autoLevelLen"), 
+		endpointerAutoLevelLen("endpointer.autoLevelLen"),
+		endpointerUseToneDetectors("endpointer.useToneDetectors"),
 		decoderConfidenceThreshold("decoder.confidenceThreshold"),
-		decoderContinuousMode("decoder.continuousMode");
+		decoderContinuousMode("decoder.continuousMode"),
+		decoderWordDetails("decoder.wordDetails"),
+		endpointerMaxSegmentDuration("endpointer.maxSegmentDuration"),
+		endpointerSegmentOverlapTime("endpointer.segmentOverlapTime"),
+		hintsWords("hints.words"),
+		textifyEnabled("textify.enabled"),
+		textifyFormattingEnabled("textify.formatting.enabled"),
+		textifyFormattingRules("textify.formatting.rules"),
+		loggingTag("loggingTag");
 
 		/** valor do header na comunicação websocket. */
 		private String header;
@@ -95,10 +104,20 @@ public class RecognitionParameters {
 	private Integer endpointerHeadMargin;
 	private Integer endpointerTailMargin;
 	private Integer endpointerWaitEnd;
-	private Integer endpointerLevelThreshold;
+	private Float endpointerLevelThreshold;
 	private Integer endpointerLevelMode;
 	private Integer endpointerAutoLevelLen;
+	private Boolean endpointerUseToneDetectors;
 	private Integer decoderConfidenceThreshold;
+	private Boolean decoderContinuousMode;
+	private String decoderWordDetails;
+	private Integer endpointerMaxSegmentDuration;
+	private Integer endpointerSegmentOverlapTime;
+	private String hintsWords;
+	private Boolean textifyEnabled;
+	private Boolean textifyFormattingEnabled;
+	private String textifyFormattingRules;
+	private String loggingTag;
 
 	/**
 	 * Obtém uma lista de todos os parametros de configuração.
@@ -265,11 +284,11 @@ public class RecognitionParameters {
 		this.endpointerWaitEnd = endpointerWaitEnd;
 	}
 
-	public Integer getEndpointerLevelThreshold() {
+	public Float getEndpointerLevelThreshold() {
 		return endpointerLevelThreshold;
 	}
 
-	public void setEndpointerLevelThreshold(Integer endpointerLevelThreshold) {
+	public void setEndpointerLevelThreshold(Float endpointerLevelThreshold) {
 		this.endpointerLevelThreshold = endpointerLevelThreshold;
 	}
 
@@ -297,6 +316,86 @@ public class RecognitionParameters {
 		this.decoderConfidenceThreshold = decoderConfidenceThreshold;
 	}
 
+	public Boolean getEndpointerUseToneDetectors() {
+		return endpointerUseToneDetectors;
+	}
+
+	public void setEndpointerUseToneDetectors(Boolean endpointerUseToneDetectors) {
+		this.endpointerUseToneDetectors = endpointerUseToneDetectors;
+	}
+
+	public Boolean getDecoderContinuousMode() {
+		return decoderContinuousMode;
+	}
+
+	public void setDecoderContinuousMode(Boolean decoderContinuousMode) {
+		this.decoderContinuousMode = decoderContinuousMode;
+	}
+
+	public String getDecoderWordDetails() {
+		return decoderWordDetails;
+	}
+
+	public void setDecoderWordDetails(String decoderWordDetails) {
+		this.decoderWordDetails = decoderWordDetails;
+	}
+
+	public Integer getEndpointerMaxSegmentDuration() {
+		return endpointerMaxSegmentDuration;
+	}
+
+	public void setEndpointerMaxSegmentDuration(Integer endpointerMaxSegmentDuration) {
+		this.endpointerMaxSegmentDuration = endpointerMaxSegmentDuration;
+	}
+
+	public Integer getEndpointerSegmentOverlapTime() {
+		return endpointerSegmentOverlapTime;
+	}
+
+	public void setEndpointerSegmentOverlapTime(Integer endpointerSegmentOverlapTime) {
+		this.endpointerSegmentOverlapTime = endpointerSegmentOverlapTime;
+	}
+
+	public String getHintsWords() {
+		return hintsWords;
+	}
+
+	public void setHintsWords(String hintsWords) {
+		this.hintsWords = hintsWords;
+	}
+
+	public Boolean getTextifyEnabled() {
+		return textifyEnabled;
+	}
+
+	public void setTextifyEnabled(Boolean textifyEnabled) {
+		this.textifyEnabled = textifyEnabled;
+	}
+
+	public Boolean getTextifyFormattingEnabled() {
+		return textifyFormattingEnabled;
+	}
+
+	public void setTextifyFormattingEnabled(Boolean textifyFormattingEnabled) {
+		this.textifyFormattingEnabled = textifyFormattingEnabled;
+	}
+
+	public String getTextifyFormattingRules() {
+		return textifyFormattingRules;
+	}
+
+	public void setTextifyFormattingRules(String textifyFormattingRules) {
+		this.textifyFormattingRules = textifyFormattingRules;
+	}
+
+	public String getLoggingTag() {
+		return loggingTag;
+	}
+
+	public void setLoggingTag(String loggingTag) {
+		this.loggingTag = loggingTag;
+	}
+
 	@Override
 	public String toString() {
 		return "RecognitionParameters [noInputTimeoutEnabled=" + noInputTimeoutEnabled + ", noInputTimeout="
@@ -305,8 +404,13 @@ public class RecognitionParameters {
 				+ decoderMaxSentences + ", endpointerHeadMargin=" + endpointerHeadMargin + ", endpointerTailMargin="
 				+ endpointerTailMargin + ", endpointerWaitEnd=" + endpointerWaitEnd + ", endpointerLevelThreshold="
 				+ endpointerLevelThreshold + ", endpointerLevelMode=" + endpointerLevelMode
-				+ ", endpointerAutoLevelLen=" + endpointerAutoLevelLen + ", decoderConfidenceThreshold="
-				+ decoderConfidenceThreshold + "]";
+				+ ", endpointerAutoLevelLen=" + endpointerAutoLevelLen + ", endpointerUseToneDetectors="
+				+ endpointerUseToneDetectors + ", decoderConfidenceThreshold=" + decoderConfidenceThreshold
+				+ ", decoderContinuousMode=" + decoderContinuousMode + ", decoderWordDetails=" + decoderWordDetails
+				+ ", endpointerMaxSegmentDuration=" + endpointerMaxSegmentDuration + ", endpointerSegmentOverlapTime="
+				+ endpointerSegmentOverlapTime + ", hintsWords=" + hintsWords + ", textifyEnabled=" + textifyEnabled
+				+ ", textifyFormattingEnabled=" + textifyFormattingEnabled + ", textifyFormattingRules="
+				+ textifyFormattingRules + ", loggingTag=" + loggingTag + "]";
 	}
 
 	@Override
@@ -314,18 +418,30 @@ public class RecognitionParameters {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((decoderConfidenceThreshold == null) ? 0 : decoderConfidenceThreshold.hashCode());
+		result = prime * result + ((decoderContinuousMode == null) ? 0 : decoderContinuousMode.hashCode());
 		result = prime * result + ((decoderMaxSentences == null) ? 0 : decoderMaxSentences.hashCode());
 		result = prime * result + ((decoderStartInputTimers == null) ? 0 : decoderStartInputTimers.hashCode());
+		result = prime * result + ((decoderWordDetails == null) ? 0 : decoderWordDetails.hashCode());
 		result = prime * result + ((endpointerAutoLevelLen == null) ? 0 : endpointerAutoLevelLen.hashCode());
 		result = prime * result + ((endpointerHeadMargin == null) ? 0 : endpointerHeadMargin.hashCode());
 		result = prime * result + ((endpointerLevelMode == null) ? 0 : endpointerLevelMode.hashCode());
 		result = prime * result + ((endpointerLevelThreshold == null) ? 0 : endpointerLevelThreshold.hashCode());
+		result = prime * result
+				+ ((endpointerMaxSegmentDuration == null) ? 0 : endpointerMaxSegmentDuration.hashCode());
+		result = prime * result
+				+ ((endpointerSegmentOverlapTime == null) ? 0 : endpointerSegmentOverlapTime.hashCode());
 		result = prime * result + ((endpointerTailMargin == null) ? 0 : endpointerTailMargin.hashCode());
+		result = prime * result + ((endpointerUseToneDetectors == null) ? 0 : endpointerUseToneDetectors.hashCode());
 		result = prime * result + ((endpointerWaitEnd == null) ? 0 : endpointerWaitEnd.hashCode());
+		result = prime * result + ((hintsWords == null) ? 0 : hintsWords.hashCode());
+		result = prime * result + ((loggingTag == null) ? 0 : loggingTag.hashCode());
 		result = prime * result + ((noInputTimeout == null) ? 0 : noInputTimeout.hashCode());
 		result = prime * result + ((noInputTimeoutEnabled == null) ? 0 : noInputTimeoutEnabled.hashCode());
 		result = prime * result + ((recognitionTimeout == null) ? 0 : recognitionTimeout.hashCode());
 		result = prime * result + ((recognitionTimeoutEnabled == null) ? 0 : recognitionTimeoutEnabled.hashCode());
+		result = prime * result + ((textifyEnabled == null) ? 0 : textifyEnabled.hashCode());
+		result = prime * result + ((textifyFormattingEnabled == null) ? 0 : textifyFormattingEnabled.hashCode());
+		result = prime * result + ((textifyFormattingRules == null) ? 0 : textifyFormattingRules.hashCode());
 		return result;
 	}
 
@@ -343,6 +459,11 @@ public class RecognitionParameters {
 				return false;
 		} else if (!decoderConfidenceThreshold.equals(other.decoderConfidenceThreshold))
 			return false;
+		if (decoderContinuousMode == null) {
+			if (other.decoderContinuousMode != null)
+				return false;
+		} else if (!decoderContinuousMode.equals(other.decoderContinuousMode))
+			return false;
 		if (decoderMaxSentences == null) {
 			if (other.decoderMaxSentences != null)
 				return false;
@@ -352,6 +473,11 @@ public class RecognitionParameters {
 			if (other.decoderStartInputTimers != null)
 				return false;
 		} else if (!decoderStartInputTimers.equals(other.decoderStartInputTimers))
+			return false;
+		if (decoderWordDetails == null) {
+			if (other.decoderWordDetails != null)
+				return false;
+		} else if (!decoderWordDetails.equals(other.decoderWordDetails))
 			return false;
 		if (endpointerAutoLevelLen == null) {
 			if (other.endpointerAutoLevelLen != null)
@@ -373,15 +499,40 @@ public class RecognitionParameters {
 				return false;
 		} else if (!endpointerLevelThreshold.equals(other.endpointerLevelThreshold))
 			return false;
+		if (endpointerMaxSegmentDuration == null) {
+			if (other.endpointerMaxSegmentDuration != null)
+				return false;
+		} else if (!endpointerMaxSegmentDuration.equals(other.endpointerMaxSegmentDuration))
+			return false;
+		if (endpointerSegmentOverlapTime == null) {
+			if (other.endpointerSegmentOverlapTime != null)
+				return false;
+		} else if (!endpointerSegmentOverlapTime.equals(other.endpointerSegmentOverlapTime))
+			return false;
 		if (endpointerTailMargin == null) {
 			if (other.endpointerTailMargin != null)
 				return false;
 		} else if (!endpointerTailMargin.equals(other.endpointerTailMargin))
 			return false;
+		if (endpointerUseToneDetectors == null) {
+			if (other.endpointerUseToneDetectors != null)
+				return false;
+		} else if (!endpointerUseToneDetectors.equals(other.endpointerUseToneDetectors))
+			return false;
 		if (endpointerWaitEnd == null) {
 			if (other.endpointerWaitEnd != null)
 				return false;
 		} else if (!endpointerWaitEnd.equals(other.endpointerWaitEnd))
+			return false;
+		if (hintsWords == null) {
+			if (other.hintsWords != null)
+				return false;
+		} else if (!hintsWords.equals(other.hintsWords))
+			return false;
+		if (loggingTag == null) {
+			if (other.loggingTag != null)
+				return false;
+		} else if (!loggingTag.equals(other.loggingTag))
 			return false;
 		if (noInputTimeout == null) {
 			if (other.noInputTimeout != null)
@@ -402,6 +553,21 @@ public class RecognitionParameters {
 			if (other.recognitionTimeoutEnabled != null)
 				return false;
 		} else if (!recognitionTimeoutEnabled.equals(other.recognitionTimeoutEnabled))
+			return false;
+		if (textifyEnabled == null) {
+			if (other.textifyEnabled != null)
+				return false;
+		} else if (!textifyEnabled.equals(other.textifyEnabled))
+			return false;
+		if (textifyFormattingEnabled == null) {
+			if (other.textifyFormattingEnabled != null)
+				return false;
+		} else if (!textifyFormattingEnabled.equals(other.textifyFormattingEnabled))
+			return false;
+		if (textifyFormattingRules == null) {
+			if (other.textifyFormattingRules != null)
+				return false;
+		} else if (!textifyFormattingRules.equals(other.textifyFormattingRules))
 			return false;
 		return true;
 	}
