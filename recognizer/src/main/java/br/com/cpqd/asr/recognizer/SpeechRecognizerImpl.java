@@ -614,6 +614,8 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 	 */
 	private class ReaderTask implements Runnable {
 
+		private static final int AUDIO_CHUNK = 4000;
+
 		/** Status of the reader task. */
 		private ReaderTaskStatus readerStatus;
 
@@ -652,15 +654,11 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 			readerStatus = ReaderTaskStatus.RUNNING;
 			this.threadName = Thread.currentThread().getName();
 
-			final int chunkSize = calculateBufferSize(builder.chunkLength, builder.audioSampleRate,
-					builder.encoding.getSampleSize());
 			int length = 0;
 			int read = 0;
-			byte[] buffer = new byte[chunkSize];
-			// atraso de envio é a duracao do pacote ajustada pelo RTF
-			final int DELAY = (int) (builder.chunkLength * builder.serverRTF);
+			byte[] buffer = new byte[AUDIO_CHUNK];
 			if (logger.isDebugEnabled())
-				logger.debug("[{}] sending audio with packet size = {} bytes (delay = {})", handle, chunkSize, DELAY);
+				logger.debug("[{}] sending audio with packet size = {} bytes)", handle, AUDIO_CHUNK);
 			try {
 				while (isListening() && read != -1 && !isCancelled()) {
 
@@ -674,7 +672,6 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 						sendAudio(new byte[] {}, 0, audio.getContentType(), true);
 					}
 
-					Thread.sleep(DELAY);
 					logger.trace("[{}] read = {}; last = {}; sleep = {}; listening = {};", handle, read, (read <= 0),
 							System.currentTimeMillis() - start, (isListening()));
 				}
@@ -694,23 +691,6 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 					logger.error("[{}] Error closing audio source", handle, e);
 				}
 			}
-		}
-
-		/**
-		 * Calcula o tamanho (em bytes) de um segmento de audio (WAV).
-		 *
-		 * @param audioLength
-		 *            duração do audio, em milis.
-		 * @param sampleRate
-		 *            taxa de audio, em bps (ex: 16000).
-		 * @param sampleSize
-		 *            tamanho da amostra em bits (ex: 16).
-		 * @return tamanho do buffer (número de bytes).
-		 *
-		 */
-		private int calculateBufferSize(int audioLength, int sampleRate, int sampleSize) {
-			float bufferSize = audioLength * (sampleRate * sampleSize) / 1000L / 8;
-			return (int) bufferSize;
 		}
 
 		@Override

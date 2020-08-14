@@ -143,21 +143,6 @@ public interface SpeechRecognizer {
 		/** Registered listener interfaces. */
 		protected List<RecognitionListener> listeners = new ArrayList<>();
 
-		/** the audio encoding. */
-		protected AudioEncoding encoding;
-
-		/** the audio sample rate. */
-		protected Integer audioSampleRate;
-
-		/** the audio language. */
-		protected LanguageCode language;
-
-		/** the audio packets length. */
-		protected Integer chunkLength;
-
-		/** the server Real Time Factor. */
-		protected Float serverRTF;
-
 		/** the maximum time to wait for a recognition result. */
 		protected Integer maxWaitSeconds;
 
@@ -182,10 +167,6 @@ public interface SpeechRecognizer {
 		 *
 		 */
 		protected Builder() {
-			this.audioSampleRate = 8000;
-			this.encoding = AudioEncoding.LINEAR16;
-			this.chunkLength = 250;
-			this.serverRTF = 0.1F;
 			this.maxWaitSeconds = 30;
 			this.maxSessionIdleSeconds = 30;
 		}
@@ -327,44 +308,6 @@ public interface SpeechRecognizer {
 			return this;
 		}
 
-		/**
-		 * Sets the audio sample rate (in bps).
-		 *
-		 * @param sampleRate
-		 *            the audio sample rate.
-		 * @return the Builder object.
-		 */
-		@SuppressWarnings("unused")
-		private SpeechRecognizer.Builder audioSampleRate(int sampleRate) {
-			this.audioSampleRate = sampleRate;
-			return this;
-		}
-
-		/**
-		 * Sets the audio encoding.
-		 *
-		 * @param encoding
-		 *            the audio encoding.
-		 * @return the Builder object.
-		 */
-		@SuppressWarnings("unused")
-		private SpeechRecognizer.Builder audioEncoding(AudioEncoding encoding) {
-			this.encoding = encoding;
-			return this;
-		}
-
-		/**
-		 * Sets the audio language.
-		 *
-		 * @param language
-		 *            the audio language.
-		 * @return the Builder object.
-		 */
-		@SuppressWarnings("unused")
-		private SpeechRecognizer.Builder language(LanguageCode language) {
-			this.language = language;
-			return this;
-		}
 	}
 
 }
