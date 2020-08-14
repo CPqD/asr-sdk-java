@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2017 CPqD. All Rights Reserved.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -62,11 +62,16 @@ public class MicAudioSource implements AudioSource, LineListener {
 		line.addLineListener(this);
 	}
 
+	@Override
+	public String getContentType() {
+		return AudioSource.AUDIO_TYPE_RAW;
+	}
+
 	/**
 	 * Obtains the size of the buffer from which data can be read. Note that the
 	 * units used are bytes, but will always correspond to an integral number of
 	 * sample frames of audio data.
-	 * 
+	 *
 	 * @return the size of the buffer in bytes
 	 */
 	public int getBufferSize() {
