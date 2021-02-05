@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2017 CPqD. All Rights Reserved.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -42,34 +42,61 @@ public class BufferAudioSource implements AudioSource {
 
 	private boolean finished = false;
 
+	private String contentType;
+
 	/**
-	 * Creates an audio source, where bytes can be written in a circular buffer by
-	 * one thread (application's), and read by a different thread (to send data to
-	 * the ASR Server).
-	 * 
+	 * Creates an audio source, where bytes can be written in a circular buffer
+	 * by one thread (application's), and read by a different thread (to send
+	 * data to the ASR Server).
+	 *
+	 * For {@link #contentType}:
+	 *
+	 *
+	 * @param contentType the audio format. Use 'audio/raw' to indicate RAW
+	 * audio already compatible to ASR (Linear PCM, Signed 16 bits, sample rate
+	 * 8kHz/16kHz). Use 'application/octet-stream' to let the service detect the
+	 * format.
+	 *
+	 * @param size the buffer size (in bytes)
+	 *
 	 * @throws IOException
-	 *             if an I/O error occurs.
 	 */
-	public BufferAudioSource() throws IOException {
+	public BufferAudioSource(String contentType, int size) throws IOException {
 		super();
+		this.contentType = contentType;
 		output = new PipedOutputStream();
-		input = new PipedInputStream(output, PIPE_SIZE);
+		input = new PipedInputStream(output, size);
 	}
 
 	/**
 	 * Creates an audio source, where bytes can be written in a circular buffer by
 	 * one thread (application's), and read by a different thread (to send data to
 	 * the ASR Server).
-	 * 
+	 *
+	 * @throws IOException
+	 *             if an I/O error occurs.
+	 */
+	public BufferAudioSource() throws IOException {
+		this("audio/raw", PIPE_SIZE);
+	}
+
+	/**
+	 * Creates an audio source, where bytes can be written in a circular buffer by
+	 * one thread (application's), and read by a different thread (to send data to
+	 * the ASR Server).
+	 *
 	 * @param size
 	 *            the buffer size (in bytes)
 	 * @throws IOException
 	 *             if an I/O error occurs.
 	 */
 	public BufferAudioSource(int size) throws IOException {
-		super();
-		output = new PipedOutputStream();
-		input = new PipedInputStream(output, size);
+		this("audio/raw", size);
+	}
+
+	@Override
+	public String getContentType() {
+		return contentType;
 	}
 
 	@Override
@@ -87,12 +114,12 @@ public class BufferAudioSource implements AudioSource {
 
 	/**
 	 * Writes the specified byte array to the circular buffer.
-	 * 
+	 *
 	 * @param b
 	 *            the byte array
 	 * @param len
 	 *            number of characters to write
-	 * 
+	 *
 	 * @return returns 'false' if the buffer was finished and the byte array was not
 	 *         written.
 	 * @throws IOException
@@ -115,7 +142,7 @@ public class BufferAudioSource implements AudioSource {
 	/**
 	 * Flushes the output stream and forces any buffered output bytes to be written
 	 * out. This will notify any readers that bytes are waiting in the pipe.
-	 * 
+	 *
 	 * @throws IOException
 	 *             if an I/O error occurs.
 	 */
@@ -126,7 +153,7 @@ public class BufferAudioSource implements AudioSource {
 	/**
 	 * Closes the output stream and releases any system resources associated with
 	 * this stream. This stream may no longer be used for writing bytes.
-	 * 
+	 *
 	 * @throws IOException
 	 *             if an I/O error occurs.
 	 */
@@ -140,7 +167,7 @@ public class BufferAudioSource implements AudioSource {
 
 	/**
 	 * Returns the circular buffer size.
-	 * 
+	 *
 	 * @return the buffer size in bytes.
 	 */
 	public int getBufferSize() {
