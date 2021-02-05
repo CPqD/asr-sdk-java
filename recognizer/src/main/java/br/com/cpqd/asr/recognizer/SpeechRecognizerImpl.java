@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2018 CPqD. All Rights Reserved.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -90,7 +90,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param builder
 	 *            the Builder object.
 	 * @throws URISyntaxException
@@ -99,7 +99,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 	 *             some sort of I/O exception has ocurred.
 	 * @throws RecognitionException
 	 *             error when creating the session.
-	 * 
+	 *
 	 */
 	public SpeechRecognizerImpl(SpeechRecognizer.Builder builder)
 			throws URISyntaxException, IOException, RecognitionException {
@@ -128,17 +128,17 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 		if (!client.isOpen()) {
 			return;
 		}
-				
+
 		if (readerTask != null && readerTask.isRunning()) {
 			// cancela a reader task.
 			readerTask.cancel();
 			logger.debug("[{}] Reader task cancelled.", handle);
 		}
-		
+
 		if (client.getStatus() == SessionStatus.IDLE) {
 			return;
 		}
-		
+
 		CancelRecognition message = new CancelRecognition();
 		message.setHandle(this.handle);
 		try {
@@ -175,7 +175,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 	/**
 	 * Opens a websocket channel and creates a new recognition session with the
 	 * server.
-	 * 
+	 *
 	 * @throws DeploymentException
 	 *             error when starting the endpoint.
 	 * @throws IOException
@@ -343,7 +343,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 		}
 
 		readerTask = null;
-		
+
 		if (isTimeoutWaitingResult) {
 			logger.warn("[{}] Timeout waiting for recognition result.", this.handle);
 			for (RecognitionListener listener : client.getListeners()) {
@@ -355,7 +355,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 		} else {
 			return Arrays.asList(sentencesQueue.toArray(new RecognitionResult[sentencesQueue.size()]));
 		}
-		
+
 	}
 
 	@Override
@@ -381,7 +381,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 				result.toString());
 
 		this.lastResultTime = Instant.now();
-		
+
 		if (!sentencesQueue.offer(result)) {
 			logger.warn("[{}] Messsage discarded, sentences queue is full: {}", this.handle, result);
 		}
@@ -453,7 +453,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 	/**
 	 * Indicates if the server is listening for audio packets in the recognition
 	 * process.
-	 * 
+	 *
 	 * @return true if the server is listening.
 	 */
 	private boolean isListening() {
@@ -466,7 +466,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 
 	/**
 	 * Sets the recognition parameters which will be valid for the entire session.
-	 * 
+	 *
 	 * @param parameters
 	 *            the recognition parameters.
 	 * @throws IOException
@@ -540,7 +540,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 
 	/**
 	 * Sends a message to the server to start listening for audio.
-	 * 
+	 *
 	 * @param lmList
 	 *            the language model list.
 	 * @param parameters
@@ -599,7 +599,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 
 	/**
 	 * Sends an audio packet to the server.
-	 * 
+	 *
 	 * @param audio
 	 *            audio buffer
 	 * @param audioLength
@@ -609,7 +609,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 	 * @throws IOException
 	 *             in case an I/O error occurs.
 	 */
-	private void sendAudio(byte[] audio, int audioLength, boolean lastPacket) throws IOException {
+	private void sendAudio(byte[] audio, int audioLength, String contentType, boolean lastPacket) throws IOException {
 		if (!client.isOpen())
 			return;
 		// throw new IOException("Websocket session is closed");
@@ -618,7 +618,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 		message.setHandle(this.handle);
 		message.setContent(audio);
 		message.setContentLength(audioLength);
-		message.setContentType(SendAudio.APPLICATION_OCTET_STREAM);
+		message.setContentType(contentType);
 		message.setLastPacket(lastPacket);
 
 		// SEND AUDIO nao recebe confirmacao de recebimento (exceto em caso de erro)
@@ -631,7 +631,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 
 	/**
 	 * Para fins de log.
-	 * 
+	 *
 	 * @return o estado de execução da thread.
 	 */
 	private String getReaderTaskStatus() {
@@ -653,6 +653,8 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 	 */
 	private class ReaderTask implements Runnable {
 
+		private static final int AUDIO_CHUNK = 4000;
+
 		/** Status of the reader task. */
 		private ReaderTaskStatus readerStatus;
 
@@ -673,9 +675,9 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 		public boolean isCancelled() {
 			return readerStatus == ReaderTaskStatus.CANCELED;
 		}
-		
+
 		public boolean hasFinished() {
-			return readerStatus != ReaderTaskStatus.IDLE && readerStatus != ReaderTaskStatus.RUNNING; 
+			return readerStatus != ReaderTaskStatus.IDLE && readerStatus != ReaderTaskStatus.RUNNING;
 		}
 
 		public boolean isRunning() {
@@ -691,15 +693,11 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 			readerStatus = ReaderTaskStatus.RUNNING;
 			this.threadName = Thread.currentThread().getName();
 
-			final int chunkSize = calculateBufferSize(builder.chunkLength, builder.audioSampleRate,
-					builder.encoding.getSampleSize());
 			int length = 0;
 			int read = 0;
-			byte[] buffer = new byte[chunkSize];
-			// atraso de envio é a duracao do pacote ajustada pelo RTF
-			final int DELAY = (int) (builder.chunkLength * builder.serverRTF);
+			byte[] buffer = new byte[AUDIO_CHUNK];
 			if (logger.isDebugEnabled())
-				logger.debug("[{}] sending audio with packet size = {} bytes (delay = {})", handle, chunkSize, DELAY);
+				logger.debug("[{}] sending audio with packet size = {} bytes)", handle, AUDIO_CHUNK);
 			try {
 				while (isListening() && read != -1 && !isCancelled()) {
 
@@ -708,12 +706,11 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 
 					if (read > 0) {
 						length += read;
-						sendAudio(buffer, read, false);
+						sendAudio(buffer, read, audio.getContentType(), false);
 					} else if (read < 0) {
-						sendAudio(new byte[] {}, 0, true);
+						sendAudio(new byte[] {}, 0, audio.getContentType(), true);
 					}
 
-					Thread.sleep(DELAY);
 					logger.trace("[{}] read = {}; last = {}; sleep = {}; listening = {};", handle, read, (read <= 0),
 							System.currentTimeMillis() - start, (isListening()));
 				}
@@ -733,23 +730,6 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 					logger.error("[{}] Error closing audio source", handle, e);
 				}
 			}
-		}
-
-		/**
-		 * Calcula o tamanho (em bytes) de um segmento de audio (WAV).
-		 * 
-		 * @param audioLength
-		 *            duração do audio, em milis.
-		 * @param sampleRate
-		 *            taxa de audio, em bps (ex: 16000).
-		 * @param sampleSize
-		 *            tamanho da amostra em bits (ex: 16).
-		 * @return tamanho do buffer (número de bytes).
-		 * 
-		 */
-		private int calculateBufferSize(int audioLength, int sampleRate, int sampleSize) {
-			float bufferSize = audioLength * (sampleRate * sampleSize) / 1000L / 8;
-			return (int) bufferSize;
 		}
 
 		@Override

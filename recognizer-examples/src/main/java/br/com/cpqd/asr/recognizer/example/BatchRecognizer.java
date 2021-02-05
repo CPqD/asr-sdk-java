@@ -42,17 +42,21 @@ import br.com.cpqd.asr.recognizer.model.RecognitionResult;
 public class BatchRecognizer {
 
 	private SpeechRecognizer recognizer;
+	private boolean decodeAudio;
 
 	public BatchRecognizer(Properties pa)
 			throws URISyntaxException, IOException, RecognitionException {
 
+		// Try to decode the audio file if possible
+		this.decodeAudio = "true".equals(pa.getProperty("decodeAudio", "true"));
+
 		String serverUrl = pa.getProperty("server");
 		String user = pa.getProperty("user");
 		String pwd = pa.getProperty("pwd");
-		
+
 		RecognitionConfig config = RecognitionConfig.builder()
 			.maxSentences(1)
-			.continuousMode(true)
+			.continuousMode("true".equals(pa.getProperty("decoder.continuousMode", "true")))
 			.recognitionTimeoutEnabled(false)
 			.noInputTimeoutEnabled(false)
 			.endPointerLevelThreshold(Integer.parseInt(pa.getProperty("endpointer.levelThreshold", "2")))
@@ -74,7 +78,7 @@ public class BatchRecognizer {
 	}
 
 	/**
-	 * Recognize a single audio file and generates a text file containing its transcription. 
+	 * Recognize a single audio file and generates a text file containing its transcription.
 	 *
 	 * @param audioFile Audio file to recognize
 	 * @param lmList Language model list
@@ -84,7 +88,14 @@ public class BatchRecognizer {
 			System.out.println("##### Processing audio: " + audioFile);
 			System.out.println();
 			// pode ser de qualquer fonte (neste caso é um arquivo)
-			AudioSource audio = new FileAudioSource(audioFile);
+			AudioSource audio = null;
+			if (audioFile.getAbsolutePath().endsWith(".raw")) {
+				// RAW files are not converted
+				audio = new FileAudioSource(audioFile, false, AudioSource.AUDIO_TYPE_RAW);
+			} else {
+				String contentType = decodeAudio ? AudioSource.AUDIO_TYPE_RAW : AudioSource.AUDIO_TYPE_DETECT;
+				audio = new FileAudioSource(audioFile, decodeAudio, contentType);
+			}
 			// envia o audio para o servidor
 			recognizer.recognize(audio, lmList);
 			// aguarda o resultado do reconhecimento
@@ -120,7 +131,7 @@ public class BatchRecognizer {
 		if (audioSource.exists()) {
 			if (audioSource.isDirectory()) {
 				try (Stream<Path> paths = Files.walk(Paths.get(audioPath))) {
-					paths.filter(Files::isRegularFile).filter(path -> path.toString().endsWith(".wav"))
+					paths.filter(Files::isRegularFile).filter(path -> !path.toString().endsWith(".txt"))
 							.map(Path::toFile).forEach(file -> {
 								recognizeFile(file, lmList);
 							});
@@ -151,7 +162,7 @@ public class BatchRecognizer {
 			System.err.println(" e.g.: BatchRecognizer --server ws://127.0.0.1:8025/asr-server/asr --lm builtin:slm/general --audio audio/pt-br/87431_8k.wav");
 			return;
 		}
-		
+
 		BatchRecognizer recognizer = new BatchRecognizer(pa);
 		recognizer.recognize(pa.getProperty("audio"), pa.getProperty("lm"));
 		recognizer.close();

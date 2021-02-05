@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2017 CPqD. All Rights Reserved.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -25,31 +25,57 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 /**
  * AudioSource implementation for a file audio source.
- * 
+ *
  */
 public class FileAudioSource implements AudioSource {
 
 	private InputStream inputStream;
 
 	private String fileName;
-	
+
 	private boolean finished = false;
+
+	private String contentType;
 
 	/**
 	 * Creates a new instance.
-	 * 
+	 *
 	 * @param file
 	 *            the file.
 	 * @throws IOException
 	 *             if an I/O error occurs.
 	 */
 	public FileAudioSource(File file) throws IOException {
+		this(file, true, "audio/raw");
+	}
+
+	/**
+	 * Creates a new instance.
+	 *
+	 * @param file File to be read
+	 * @param decodeAudio 'true' if audio must be converted to RAW before sending.
+	 * @param contentType The output audio format (after decoding).
+	 *
+	 * @throws IOException
+	 */
+	public FileAudioSource(File file, boolean decodeAudio, String contentType) throws IOException {
 		this.fileName = file.getName();
+		this.contentType = decodeAudio ? AudioSource.AUDIO_TYPE_RAW : contentType;
+
 		try {
-			this.inputStream = AudioSystem.getAudioInputStream(file);
+			if (decodeAudio) {
+				this.inputStream = AudioSystem.getAudioInputStream(file);
+			} else {
+				this.inputStream = new FileInputStream(file);
+			}
 		} catch (UnsupportedAudioFileException e) {
-			this.inputStream = new FileInputStream(file);
+			throw new IOException(e);
 		}
+	}
+
+	@Override
+	public String getContentType() {
+		return contentType;
 	}
 
 	@Override

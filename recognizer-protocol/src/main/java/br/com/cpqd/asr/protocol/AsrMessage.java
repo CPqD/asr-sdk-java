@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2017 CPqD. All Rights Reserved.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The ASR Protocol Message base class.
- * 
+ *
  */
 public abstract class AsrMessage {
 
@@ -34,6 +34,7 @@ public abstract class AsrMessage {
 
 	public static final String AUDIO_WAV = "audio/wav";
 	public static final String APPLICATION_GRAMMAR_XML = "application/grammar+xml";
+	public static final String AUDIO_RAW = "audio/raw";
 	public static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
 	public static final String APPLICATION_JSON = "application/json";
 	public static final String APPLICATION_SRGS_XML = "application/srgs+xml";
@@ -44,8 +45,8 @@ public abstract class AsrMessage {
 	public static final String TEXT_XML = "text/xml";
 
 	public enum AsrMessageType {
-		CREATE_SESSION, START_RECOGNITION, CANCEL_RECOGNITION, SEND_AUDIO, RELEASE_SESSION, 
-		START_INPUT_TIMERS, SET_PARAMETERS, GET_PARAMETERS, DEFINE_GRAMMAR, START_OF_SPEECH, 
+		CREATE_SESSION, START_RECOGNITION, CANCEL_RECOGNITION, SEND_AUDIO, RELEASE_SESSION,
+		START_INPUT_TIMERS, SET_PARAMETERS, GET_PARAMETERS, DEFINE_GRAMMAR, START_OF_SPEECH,
 		END_OF_SPEECH, RECOGNITION_RESULT, INTERPRET_TEXT, RESPONSE
 
 	};
@@ -133,14 +134,14 @@ public abstract class AsrMessage {
 	/**
 	 * Retorna um mapa com os headers que devem ser enviados na mensagem pelo
 	 * websocket.
-	 * 
+	 *
 	 * @return mapa de headers da mensagem.
 	 */
 	public abstract HashMap<String, String> getHeaders();
 
 	/**
 	 * Cria uma mensagem.
-	 * 
+	 *
 	 * @param type
 	 *            tipo da mensagem.
 	 * @param headers
@@ -210,7 +211,7 @@ public abstract class AsrMessage {
 	/**
 	 * Método utilizado para popular os campos da mensagem, com base nos headers e
 	 * conteúdo recebido.
-	 * 
+	 *
 	 * @param headers
 	 *            mapa com os headers recebidos.
 	 * @param content
