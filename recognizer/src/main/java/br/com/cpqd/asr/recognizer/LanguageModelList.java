@@ -110,7 +110,6 @@ public class LanguageModelList {
 		 * @return the builder object.
 		 */
 		public LanguageModelList.Builder addFromURI(String uri) {
-//			if (this.grammarList.size() > 0) throw new IndexOutOfBoundsException("Only one URI is supported.");
 			this.uriList.add(uri);
 			return this;
 		}
@@ -125,7 +124,6 @@ public class LanguageModelList {
 		 * @return the builder object.
 		 */
 		public LanguageModelList.Builder addInlineGrammar(String id, String body) {
-//			if (this.grammarList.size() > 0) throw new IndexOutOfBoundsException("Only one grammar is supported.");
 			this.grammarList.add(new String[] { id, body });
 			return this;
 		}

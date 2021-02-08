@@ -17,6 +17,7 @@ package br.com.cpqd.asr.protocol;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,14 +66,14 @@ public class RecognitionParameters {
 		loggingTag("loggingTag");
 
 		/** valor do header na comunicação websocket. */
-		private String header;
+		private String headerName;
 
 		private Header(String header) {
-			this.header = header;
+			this.headerName = header;
 		}
 
 		public String getHeader() {
-			return this.header;
+			return this.headerName;
 		}
 
 		/**
@@ -86,7 +87,7 @@ public class RecognitionParameters {
 			for (Header h : Header.values()) {
 				// comparar o header convertendo para minusculo para evitar
 				// erros
-				if (h.getHeader().toLowerCase().equals(header.toLowerCase()))
+				if (h.getHeader().equalsIgnoreCase(header))
 					return h;
 			}
 			return null;
@@ -144,7 +145,7 @@ public class RecognitionParameters {
 	 * @param parameters
 	 *            a key do mapa deve ser o atributo conforme definido no enum Header
 	 */
-	public RecognitionParameters(HashMap<String, String> parameters) {
+	public RecognitionParameters(Map<String, String> parameters) {
 
 		Method[] mList = RecognitionParameters.class.getDeclaredMethods();
 
@@ -180,11 +181,10 @@ public class RecognitionParameters {
 						Boolean value = convertToBoolean(stringValue);
 						m.invoke(this, value);
 					} else {
-						logger.warn("Argument type not handled {} for parameter {}", parameterTypes[0].toString(),
-								h.toString());
+						logger.warn("Argument type not handled {} for parameter {}", parameterTypes[0], h);
 					}
 				} catch (Exception e) {
-					logger.error("Error parsing attribute " + param + ": " + e.getMessage());
+					logger.error("Error parsing attribute {}: {}", param, e.getMessage());
 				}
 			}
 		}
@@ -192,7 +192,7 @@ public class RecognitionParameters {
 	}
 
 	@JsonIgnore
-	public HashMap<String, String> getParameterMap() {
+	public Map<String, String> getParameterMap() {
 		@SuppressWarnings("rawtypes")
 		Class noparams[] = {};
 		HashMap<String, String> paramMap = new HashMap<>();
@@ -206,7 +206,7 @@ public class RecognitionParameters {
 					paramMap.put(h.getHeader(), obj.toString());
 				}
 			} catch (Exception e) {
-				logger.error("Error invoking method: " + mName + "(): " + e.getMessage());
+				logger.error("Error invoking method: {}(): {}", mName, e.getMessage());
 			}
 		}
 		return paramMap;
@@ -398,51 +398,13 @@ public class RecognitionParameters {
 
 	@Override
 	public String toString() {
-		return "RecognitionParameters [noInputTimeoutEnabled=" + noInputTimeoutEnabled + ", noInputTimeout="
-				+ noInputTimeout + ", recognitionTimeoutEnabled=" + recognitionTimeoutEnabled + ", recognitionTimeout="
-				+ recognitionTimeout + ", decoderStartInputTimers=" + decoderStartInputTimers + ", decoderMaxSentences="
-				+ decoderMaxSentences + ", endpointerHeadMargin=" + endpointerHeadMargin + ", endpointerTailMargin="
-				+ endpointerTailMargin + ", endpointerWaitEnd=" + endpointerWaitEnd + ", endpointerLevelThreshold="
-				+ endpointerLevelThreshold + ", endpointerLevelMode=" + endpointerLevelMode
-				+ ", endpointerAutoLevelLen=" + endpointerAutoLevelLen + ", endpointerUseToneDetectors="
-				+ endpointerUseToneDetectors + ", decoderConfidenceThreshold=" + decoderConfidenceThreshold
-				+ ", decoderContinuousMode=" + decoderContinuousMode + ", decoderWordDetails=" + decoderWordDetails
-				+ ", endpointerMaxSegmentDuration=" + endpointerMaxSegmentDuration + ", endpointerSegmentOverlapTime="
-				+ endpointerSegmentOverlapTime + ", hintsWords=" + hintsWords + ", textifyEnabled=" + textifyEnabled
-				+ ", textifyFormattingEnabled=" + textifyFormattingEnabled + ", textifyFormattingRules="
-				+ textifyFormattingRules + ", loggingTag=" + loggingTag + "]";
+		String str = this.getParameterMap().toString();
+		return "RecognitionParameters [" + str.subSequence(1, str.length() - 1) + "]";
 	}
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((decoderConfidenceThreshold == null) ? 0 : decoderConfidenceThreshold.hashCode());
-		result = prime * result + ((decoderContinuousMode == null) ? 0 : decoderContinuousMode.hashCode());
-		result = prime * result + ((decoderMaxSentences == null) ? 0 : decoderMaxSentences.hashCode());
-		result = prime * result + ((decoderStartInputTimers == null) ? 0 : decoderStartInputTimers.hashCode());
-		result = prime * result + ((decoderWordDetails == null) ? 0 : decoderWordDetails.hashCode());
-		result = prime * result + ((endpointerAutoLevelLen == null) ? 0 : endpointerAutoLevelLen.hashCode());
-		result = prime * result + ((endpointerHeadMargin == null) ? 0 : endpointerHeadMargin.hashCode());
-		result = prime * result + ((endpointerLevelMode == null) ? 0 : endpointerLevelMode.hashCode());
-		result = prime * result + ((endpointerLevelThreshold == null) ? 0 : endpointerLevelThreshold.hashCode());
-		result = prime * result
-				+ ((endpointerMaxSegmentDuration == null) ? 0 : endpointerMaxSegmentDuration.hashCode());
-		result = prime * result
-				+ ((endpointerSegmentOverlapTime == null) ? 0 : endpointerSegmentOverlapTime.hashCode());
-		result = prime * result + ((endpointerTailMargin == null) ? 0 : endpointerTailMargin.hashCode());
-		result = prime * result + ((endpointerUseToneDetectors == null) ? 0 : endpointerUseToneDetectors.hashCode());
-		result = prime * result + ((endpointerWaitEnd == null) ? 0 : endpointerWaitEnd.hashCode());
-		result = prime * result + ((hintsWords == null) ? 0 : hintsWords.hashCode());
-		result = prime * result + ((loggingTag == null) ? 0 : loggingTag.hashCode());
-		result = prime * result + ((noInputTimeout == null) ? 0 : noInputTimeout.hashCode());
-		result = prime * result + ((noInputTimeoutEnabled == null) ? 0 : noInputTimeoutEnabled.hashCode());
-		result = prime * result + ((recognitionTimeout == null) ? 0 : recognitionTimeout.hashCode());
-		result = prime * result + ((recognitionTimeoutEnabled == null) ? 0 : recognitionTimeoutEnabled.hashCode());
-		result = prime * result + ((textifyEnabled == null) ? 0 : textifyEnabled.hashCode());
-		result = prime * result + ((textifyFormattingEnabled == null) ? 0 : textifyFormattingEnabled.hashCode());
-		result = prime * result + ((textifyFormattingRules == null) ? 0 : textifyFormattingRules.hashCode());
-		return result;
+		return this.getParameterMap().hashCode();
 	}
 
 	@Override
@@ -454,122 +416,7 @@ public class RecognitionParameters {
 		if (getClass() != obj.getClass())
 			return false;
 		RecognitionParameters other = (RecognitionParameters) obj;
-		if (decoderConfidenceThreshold == null) {
-			if (other.decoderConfidenceThreshold != null)
-				return false;
-		} else if (!decoderConfidenceThreshold.equals(other.decoderConfidenceThreshold))
-			return false;
-		if (decoderContinuousMode == null) {
-			if (other.decoderContinuousMode != null)
-				return false;
-		} else if (!decoderContinuousMode.equals(other.decoderContinuousMode))
-			return false;
-		if (decoderMaxSentences == null) {
-			if (other.decoderMaxSentences != null)
-				return false;
-		} else if (!decoderMaxSentences.equals(other.decoderMaxSentences))
-			return false;
-		if (decoderStartInputTimers == null) {
-			if (other.decoderStartInputTimers != null)
-				return false;
-		} else if (!decoderStartInputTimers.equals(other.decoderStartInputTimers))
-			return false;
-		if (decoderWordDetails == null) {
-			if (other.decoderWordDetails != null)
-				return false;
-		} else if (!decoderWordDetails.equals(other.decoderWordDetails))
-			return false;
-		if (endpointerAutoLevelLen == null) {
-			if (other.endpointerAutoLevelLen != null)
-				return false;
-		} else if (!endpointerAutoLevelLen.equals(other.endpointerAutoLevelLen))
-			return false;
-		if (endpointerHeadMargin == null) {
-			if (other.endpointerHeadMargin != null)
-				return false;
-		} else if (!endpointerHeadMargin.equals(other.endpointerHeadMargin))
-			return false;
-		if (endpointerLevelMode == null) {
-			if (other.endpointerLevelMode != null)
-				return false;
-		} else if (!endpointerLevelMode.equals(other.endpointerLevelMode))
-			return false;
-		if (endpointerLevelThreshold == null) {
-			if (other.endpointerLevelThreshold != null)
-				return false;
-		} else if (!endpointerLevelThreshold.equals(other.endpointerLevelThreshold))
-			return false;
-		if (endpointerMaxSegmentDuration == null) {
-			if (other.endpointerMaxSegmentDuration != null)
-				return false;
-		} else if (!endpointerMaxSegmentDuration.equals(other.endpointerMaxSegmentDuration))
-			return false;
-		if (endpointerSegmentOverlapTime == null) {
-			if (other.endpointerSegmentOverlapTime != null)
-				return false;
-		} else if (!endpointerSegmentOverlapTime.equals(other.endpointerSegmentOverlapTime))
-			return false;
-		if (endpointerTailMargin == null) {
-			if (other.endpointerTailMargin != null)
-				return false;
-		} else if (!endpointerTailMargin.equals(other.endpointerTailMargin))
-			return false;
-		if (endpointerUseToneDetectors == null) {
-			if (other.endpointerUseToneDetectors != null)
-				return false;
-		} else if (!endpointerUseToneDetectors.equals(other.endpointerUseToneDetectors))
-			return false;
-		if (endpointerWaitEnd == null) {
-			if (other.endpointerWaitEnd != null)
-				return false;
-		} else if (!endpointerWaitEnd.equals(other.endpointerWaitEnd))
-			return false;
-		if (hintsWords == null) {
-			if (other.hintsWords != null)
-				return false;
-		} else if (!hintsWords.equals(other.hintsWords))
-			return false;
-		if (loggingTag == null) {
-			if (other.loggingTag != null)
-				return false;
-		} else if (!loggingTag.equals(other.loggingTag))
-			return false;
-		if (noInputTimeout == null) {
-			if (other.noInputTimeout != null)
-				return false;
-		} else if (!noInputTimeout.equals(other.noInputTimeout))
-			return false;
-		if (noInputTimeoutEnabled == null) {
-			if (other.noInputTimeoutEnabled != null)
-				return false;
-		} else if (!noInputTimeoutEnabled.equals(other.noInputTimeoutEnabled))
-			return false;
-		if (recognitionTimeout == null) {
-			if (other.recognitionTimeout != null)
-				return false;
-		} else if (!recognitionTimeout.equals(other.recognitionTimeout))
-			return false;
-		if (recognitionTimeoutEnabled == null) {
-			if (other.recognitionTimeoutEnabled != null)
-				return false;
-		} else if (!recognitionTimeoutEnabled.equals(other.recognitionTimeoutEnabled))
-			return false;
-		if (textifyEnabled == null) {
-			if (other.textifyEnabled != null)
-				return false;
-		} else if (!textifyEnabled.equals(other.textifyEnabled))
-			return false;
-		if (textifyFormattingEnabled == null) {
-			if (other.textifyFormattingEnabled != null)
-				return false;
-		} else if (!textifyFormattingEnabled.equals(other.textifyFormattingEnabled))
-			return false;
-		if (textifyFormattingRules == null) {
-			if (other.textifyFormattingRules != null)
-				return false;
-		} else if (!textifyFormattingRules.equals(other.textifyFormattingRules))
-			return false;
-		return true;
+		return other.getParameterMap().equals(this.getParameterMap());
 	}
 
 	private boolean convertToBoolean(String value) {

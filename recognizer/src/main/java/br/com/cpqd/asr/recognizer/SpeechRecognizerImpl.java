@@ -378,7 +378,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 	@Override
 	public void onRecognitionResult(RecognitionResult result) {
 		logger.debug("[{}] Recognition result (last={}): {}", this.handle, result.isLastSpeechSegment(),
-				result.toString());
+				result);
 
 		this.lastResultTime = Instant.now();
 
@@ -415,7 +415,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 
 	@Override
 	public void onPartialRecognitionResult(PartialRecognitionResult result) {
-		logger.debug("[{}] Partial recognition result: {}", this.handle, result.toString());
+		logger.debug("[{}] Partial recognition result: {}", this.handle, result);
 	}
 
 	@Override
@@ -425,7 +425,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 			return;
 		}
 
-		logger.warn("[{}] Recognition error: {}", this.handle, error.toString());
+		logger.warn("[{}] Recognition error: {}", this.handle, error);
 
 		if (readerTask != null && readerTask.isRunning()) {
 			// o servidor nao esta mais ouvindo. Encerra o envio de audio
@@ -491,7 +491,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 			} else if (response.getResult().equals(Result.SUCCESS)) {
 				logger.trace("[{}] Session configured.", handle);
 			} else {
-				logger.error("[{}] Error configuring session parameters: {}", handle, response.getSessionStatus(),
+				logger.error("[{}] Error configuring session parameters: {} {}", handle, response.getSessionStatus(),
 						response.getErrorMessage());
 				throw new RecognitionException(RecognitionErrorCode.FAILURE, response.getErrorMessage());
 			}
@@ -612,7 +612,6 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 	private void sendAudio(byte[] audio, int audioLength, String contentType, boolean lastPacket) throws IOException {
 		if (!client.isOpen())
 			return;
-		// throw new IOException("Websocket session is closed");
 
 		SendAudio message = new SendAudio();
 		message.setHandle(this.handle);
