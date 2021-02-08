@@ -70,7 +70,7 @@ public class BatchRecognizer {
 			throws URISyntaxException, IOException, RecognitionException {
 
 		// Try to decode the audio file if possible
-		this.decodeAudio = "true".equalsIgnoreCase(pa.getProperty("decodeAudio", "true"));
+		this.decodeAudio = "true".equalsIgnoreCase(pa.getProperty("decodeAudio", "false"));
 
 		String serverUrl = pa.getProperty("server");
 		String user = pa.getProperty("user");
