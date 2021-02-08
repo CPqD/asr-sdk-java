@@ -19,6 +19,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -44,11 +45,32 @@ public class BatchRecognizer {
 	private SpeechRecognizer recognizer;
 	private boolean decodeAudio;
 
+
+	public static void main(String[] args) throws IOException, URISyntaxException, RecognitionException {
+
+		Properties pa = ProgramArguments.parseFrom(args);
+
+		if (args.length == 0) {
+			System.err.println("The BatchRecognizer sample can be used with the following arguments:");
+			System.err.println(" --server <Server URL>. e.g.: ws://127.0.0.1:8025/asr-server/asr");
+			System.err.println(" --lm <comma separated list of LM URIs and local filepath>. e.g.: @grammar/pt-br/digits.gram,builtin:grammar/alphacode,builtin:slm/general");
+			System.err.println(" --audio <filepath or directory>. e.g.: audio/pt-br");
+			System.err.println(" --<param> <value> (Parameters described at https://speechweb.cpqd.com.br/asr/docs/latest/config_asr)\n");
+			System.err.println(" e.g.: BatchRecognizer --server ws://127.0.0.1:8025/asr-server/asr --lm builtin:slm/general --audio audio/pt-br/87431_8k.wav");
+			System.err.println(" e.g.: BatchRecognizer --server ws://127.0.0.1:8025/asr-server/asr --lm @grammar/pt-br/digits.gram,builtin:grammar/alphacode,builtin:slm/general --audio audio/pt-br ");
+			return;
+		}
+
+		BatchRecognizer recognizer = new BatchRecognizer(pa);
+		recognizer.recognize(pa.getProperty("audio"), languageModel(pa.getProperty("lm")));
+		recognizer.close();
+	}
+
 	public BatchRecognizer(Properties pa)
 			throws URISyntaxException, IOException, RecognitionException {
 
 		// Try to decode the audio file if possible
-		this.decodeAudio = "true".equals(pa.getProperty("decodeAudio", "true"));
+		this.decodeAudio = "true".equalsIgnoreCase(pa.getProperty("decodeAudio", "true"));
 
 		String serverUrl = pa.getProperty("server");
 		String user = pa.getProperty("user");
@@ -63,6 +85,7 @@ public class BatchRecognizer {
 			.confidenceThreshold(Integer.parseInt(pa.getProperty("decoder.confidenceThreshold", "30")))
 			.waitEndMilis(Integer.parseInt(pa.getProperty("endpointer.waitEnd", "2000")))
 			.loggingTag("BatchRecognizer")
+			.wordHints(hints(pa.getProperty("hints.words")))
 			.build();
 
 		recognizer = SpeechRecognizer.builder().serverURL(serverUrl).userAgent("client=JavaSE;app=BatchRecognizer")
@@ -122,10 +145,7 @@ public class BatchRecognizer {
 	 * @throws IOException
 	 * @throws RecognitionException
 	 */
-	public void recognize(String audioPath, String lmURI) throws IOException, RecognitionException {
-
-		// modelo da língua
-		LanguageModelList lmList = LanguageModelList.builder().addFromURI(lmURI).build();
+	public void recognize(String audioPath, LanguageModelList lmList) throws IOException, RecognitionException {
 
 		File audioSource = new File(audioPath);
 		if (audioSource.exists()) {
@@ -153,19 +173,27 @@ public class BatchRecognizer {
 		}
 	}
 
-	public static void main(String[] args) throws IOException, URISyntaxException, RecognitionException {
-
-		Properties pa = ProgramArguments.parseFrom(args);
-
-		if (args.length == 0) {
-			System.err.println("Usage: BatchRecognizer --server <Server URL> --lm <LM URI> --audio <Audio Path> [--user <username> --pwd <password>]");
-			System.err.println(" e.g.: BatchRecognizer --server ws://127.0.0.1:8025/asr-server/asr --lm builtin:slm/general --audio audio/pt-br/87431_8k.wav");
-			return;
-		}
-
-		BatchRecognizer recognizer = new BatchRecognizer(pa);
-		recognizer.recognize(pa.getProperty("audio"), pa.getProperty("lm"));
-		recognizer.close();
+	private static String hints(String hints) throws IOException {
+		// word hints
+		if (hints != null && hints.startsWith("@"))
+			return Files.readString(Paths.get(hints.substring(1)), StandardCharsets.UTF_8);
+		return hints;
 	}
 
+	private static LanguageModelList languageModel(String lm) throws IOException {
+		LanguageModelList.Builder lmBuilder = LanguageModelList.builder();
+		for (String lmPath : lm.split(",")) {
+			if (lmPath.startsWith("@")) {
+				// gramatica inline (ler conteúdo do arquivo indicado no path)
+				String grammarBody = new String(Files.readAllBytes(Paths.get(lmPath.substring(1))));
+				String grammarName = lmPath.substring(lmPath.lastIndexOf("/")).replace(".", "_").replace("/", "_");
+				System.out.println("[" + lmPath + "] Grammar name: " + grammarName);
+				lmBuilder.addInlineGrammar(grammarName, grammarBody);
+			} else {
+				System.out.println("[" + lmPath + "] Grammar URI");
+				lmBuilder.addFromURI(lmPath);
+			}
+		}
+		return lmBuilder.build();
+	}
 }
