@@ -17,6 +17,7 @@ package br.com.cpqd.asr.protocol;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,19 +52,28 @@ public class RecognitionParameters {
 		endpointerWaitEnd("endpointer.waitEnd"), 
 		endpointerLevelThreshold("endpointer.levelThreshold"), 
 		endpointerLevelMode("endpointer.levelMode"), 
-		endpointerAutoLevelLen("endpointer.autoLevelLen"), 
+		endpointerAutoLevelLen("endpointer.autoLevelLen"),
+		endpointerUseToneDetectors("endpointer.useToneDetectors"),
 		decoderConfidenceThreshold("decoder.confidenceThreshold"),
-		decoderContinuousMode("decoder.continuousMode");
+		decoderContinuousMode("decoder.continuousMode"),
+		decoderWordDetails("decoder.wordDetails"),
+		endpointerMaxSegmentDuration("endpointer.maxSegmentDuration"),
+		endpointerSegmentOverlapTime("endpointer.segmentOverlapTime"),
+		hintsWords("hints.words"),
+		textifyEnabled("textify.enabled"),
+		textifyFormattingEnabled("textify.formatting.enabled"),
+		textifyFormattingRules("textify.formatting.rules"),
+		loggingTag("loggingTag");
 
 		/** valor do header na comunicação websocket. */
-		private String header;
+		private String headerName;
 
 		private Header(String header) {
-			this.header = header;
+			this.headerName = header;
 		}
 
 		public String getHeader() {
-			return this.header;
+			return this.headerName;
 		}
 
 		/**
@@ -77,7 +87,7 @@ public class RecognitionParameters {
 			for (Header h : Header.values()) {
 				// comparar o header convertendo para minusculo para evitar
 				// erros
-				if (h.getHeader().toLowerCase().equals(header.toLowerCase()))
+				if (h.getHeader().equalsIgnoreCase(header))
 					return h;
 			}
 			return null;
@@ -95,10 +105,20 @@ public class RecognitionParameters {
 	private Integer endpointerHeadMargin;
 	private Integer endpointerTailMargin;
 	private Integer endpointerWaitEnd;
-	private Integer endpointerLevelThreshold;
+	private Float endpointerLevelThreshold;
 	private Integer endpointerLevelMode;
 	private Integer endpointerAutoLevelLen;
+	private Boolean endpointerUseToneDetectors;
 	private Integer decoderConfidenceThreshold;
+	private Boolean decoderContinuousMode;
+	private String decoderWordDetails;
+	private Integer endpointerMaxSegmentDuration;
+	private Integer endpointerSegmentOverlapTime;
+	private String hintsWords;
+	private Boolean textifyEnabled;
+	private Boolean textifyFormattingEnabled;
+	private String textifyFormattingRules;
+	private String loggingTag;
 
 	/**
 	 * Obtém uma lista de todos os parametros de configuração.
@@ -125,7 +145,7 @@ public class RecognitionParameters {
 	 * @param parameters
 	 *            a key do mapa deve ser o atributo conforme definido no enum Header
 	 */
-	public RecognitionParameters(HashMap<String, String> parameters) {
+	public RecognitionParameters(Map<String, String> parameters) {
 
 		Method[] mList = RecognitionParameters.class.getDeclaredMethods();
 
@@ -161,11 +181,10 @@ public class RecognitionParameters {
 						Boolean value = convertToBoolean(stringValue);
 						m.invoke(this, value);
 					} else {
-						logger.warn("Argument type not handled {} for parameter {}", parameterTypes[0].toString(),
-								h.toString());
+						logger.warn("Argument type not handled {} for parameter {}", parameterTypes[0], h);
 					}
 				} catch (Exception e) {
-					logger.error("Error parsing attribute " + param + ": " + e.getMessage());
+					logger.error("Error parsing attribute {}: {}", param, e.getMessage());
 				}
 			}
 		}
@@ -173,7 +192,7 @@ public class RecognitionParameters {
 	}
 
 	@JsonIgnore
-	public HashMap<String, String> getParameterMap() {
+	public Map<String, String> getParameterMap() {
 		@SuppressWarnings("rawtypes")
 		Class noparams[] = {};
 		HashMap<String, String> paramMap = new HashMap<>();
@@ -187,7 +206,7 @@ public class RecognitionParameters {
 					paramMap.put(h.getHeader(), obj.toString());
 				}
 			} catch (Exception e) {
-				logger.error("Error invoking method: " + mName + "(): " + e.getMessage());
+				logger.error("Error invoking method: {}(): {}", mName, e.getMessage());
 			}
 		}
 		return paramMap;
@@ -265,11 +284,11 @@ public class RecognitionParameters {
 		this.endpointerWaitEnd = endpointerWaitEnd;
 	}
 
-	public Integer getEndpointerLevelThreshold() {
+	public Float getEndpointerLevelThreshold() {
 		return endpointerLevelThreshold;
 	}
 
-	public void setEndpointerLevelThreshold(Integer endpointerLevelThreshold) {
+	public void setEndpointerLevelThreshold(Float endpointerLevelThreshold) {
 		this.endpointerLevelThreshold = endpointerLevelThreshold;
 	}
 
@@ -297,36 +316,95 @@ public class RecognitionParameters {
 		this.decoderConfidenceThreshold = decoderConfidenceThreshold;
 	}
 
+	public Boolean getEndpointerUseToneDetectors() {
+		return endpointerUseToneDetectors;
+	}
+
+	public void setEndpointerUseToneDetectors(Boolean endpointerUseToneDetectors) {
+		this.endpointerUseToneDetectors = endpointerUseToneDetectors;
+	}
+
+	public Boolean getDecoderContinuousMode() {
+		return decoderContinuousMode;
+	}
+
+	public void setDecoderContinuousMode(Boolean decoderContinuousMode) {
+		this.decoderContinuousMode = decoderContinuousMode;
+	}
+
+	public String getDecoderWordDetails() {
+		return decoderWordDetails;
+	}
+
+	public void setDecoderWordDetails(String decoderWordDetails) {
+		this.decoderWordDetails = decoderWordDetails;
+	}
+
+	public Integer getEndpointerMaxSegmentDuration() {
+		return endpointerMaxSegmentDuration;
+	}
+
+	public void setEndpointerMaxSegmentDuration(Integer endpointerMaxSegmentDuration) {
+		this.endpointerMaxSegmentDuration = endpointerMaxSegmentDuration;
+	}
+
+	public Integer getEndpointerSegmentOverlapTime() {
+		return endpointerSegmentOverlapTime;
+	}
+
+	public void setEndpointerSegmentOverlapTime(Integer endpointerSegmentOverlapTime) {
+		this.endpointerSegmentOverlapTime = endpointerSegmentOverlapTime;
+	}
+
+	public String getHintsWords() {
+		return hintsWords;
+	}
+
+	public void setHintsWords(String hintsWords) {
+		this.hintsWords = hintsWords;
+	}
+
+	public Boolean getTextifyEnabled() {
+		return textifyEnabled;
+	}
+
+	public void setTextifyEnabled(Boolean textifyEnabled) {
+		this.textifyEnabled = textifyEnabled;
+	}
+
+	public Boolean getTextifyFormattingEnabled() {
+		return textifyFormattingEnabled;
+	}
+
+	public void setTextifyFormattingEnabled(Boolean textifyFormattingEnabled) {
+		this.textifyFormattingEnabled = textifyFormattingEnabled;
+	}
+
+	public String getTextifyFormattingRules() {
+		return textifyFormattingRules;
+	}
+
+	public void setTextifyFormattingRules(String textifyFormattingRules) {
+		this.textifyFormattingRules = textifyFormattingRules;
+	}
+
+	public String getLoggingTag() {
+		return loggingTag;
+	}
+
+	public void setLoggingTag(String loggingTag) {
+		this.loggingTag = loggingTag;
+	}
+
 	@Override
 	public String toString() {
-		return "RecognitionParameters [noInputTimeoutEnabled=" + noInputTimeoutEnabled + ", noInputTimeout="
-				+ noInputTimeout + ", recognitionTimeoutEnabled=" + recognitionTimeoutEnabled + ", recognitionTimeout="
-				+ recognitionTimeout + ", decoderStartInputTimers=" + decoderStartInputTimers + ", decoderMaxSentences="
-				+ decoderMaxSentences + ", endpointerHeadMargin=" + endpointerHeadMargin + ", endpointerTailMargin="
-				+ endpointerTailMargin + ", endpointerWaitEnd=" + endpointerWaitEnd + ", endpointerLevelThreshold="
-				+ endpointerLevelThreshold + ", endpointerLevelMode=" + endpointerLevelMode
-				+ ", endpointerAutoLevelLen=" + endpointerAutoLevelLen + ", decoderConfidenceThreshold="
-				+ decoderConfidenceThreshold + "]";
+		String str = this.getParameterMap().toString();
+		return "RecognitionParameters [" + str.subSequence(1, str.length() - 1) + "]";
 	}
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((decoderConfidenceThreshold == null) ? 0 : decoderConfidenceThreshold.hashCode());
-		result = prime * result + ((decoderMaxSentences == null) ? 0 : decoderMaxSentences.hashCode());
-		result = prime * result + ((decoderStartInputTimers == null) ? 0 : decoderStartInputTimers.hashCode());
-		result = prime * result + ((endpointerAutoLevelLen == null) ? 0 : endpointerAutoLevelLen.hashCode());
-		result = prime * result + ((endpointerHeadMargin == null) ? 0 : endpointerHeadMargin.hashCode());
-		result = prime * result + ((endpointerLevelMode == null) ? 0 : endpointerLevelMode.hashCode());
-		result = prime * result + ((endpointerLevelThreshold == null) ? 0 : endpointerLevelThreshold.hashCode());
-		result = prime * result + ((endpointerTailMargin == null) ? 0 : endpointerTailMargin.hashCode());
-		result = prime * result + ((endpointerWaitEnd == null) ? 0 : endpointerWaitEnd.hashCode());
-		result = prime * result + ((noInputTimeout == null) ? 0 : noInputTimeout.hashCode());
-		result = prime * result + ((noInputTimeoutEnabled == null) ? 0 : noInputTimeoutEnabled.hashCode());
-		result = prime * result + ((recognitionTimeout == null) ? 0 : recognitionTimeout.hashCode());
-		result = prime * result + ((recognitionTimeoutEnabled == null) ? 0 : recognitionTimeoutEnabled.hashCode());
-		return result;
+		return this.getParameterMap().hashCode();
 	}
 
 	@Override
@@ -338,72 +416,7 @@ public class RecognitionParameters {
 		if (getClass() != obj.getClass())
 			return false;
 		RecognitionParameters other = (RecognitionParameters) obj;
-		if (decoderConfidenceThreshold == null) {
-			if (other.decoderConfidenceThreshold != null)
-				return false;
-		} else if (!decoderConfidenceThreshold.equals(other.decoderConfidenceThreshold))
-			return false;
-		if (decoderMaxSentences == null) {
-			if (other.decoderMaxSentences != null)
-				return false;
-		} else if (!decoderMaxSentences.equals(other.decoderMaxSentences))
-			return false;
-		if (decoderStartInputTimers == null) {
-			if (other.decoderStartInputTimers != null)
-				return false;
-		} else if (!decoderStartInputTimers.equals(other.decoderStartInputTimers))
-			return false;
-		if (endpointerAutoLevelLen == null) {
-			if (other.endpointerAutoLevelLen != null)
-				return false;
-		} else if (!endpointerAutoLevelLen.equals(other.endpointerAutoLevelLen))
-			return false;
-		if (endpointerHeadMargin == null) {
-			if (other.endpointerHeadMargin != null)
-				return false;
-		} else if (!endpointerHeadMargin.equals(other.endpointerHeadMargin))
-			return false;
-		if (endpointerLevelMode == null) {
-			if (other.endpointerLevelMode != null)
-				return false;
-		} else if (!endpointerLevelMode.equals(other.endpointerLevelMode))
-			return false;
-		if (endpointerLevelThreshold == null) {
-			if (other.endpointerLevelThreshold != null)
-				return false;
-		} else if (!endpointerLevelThreshold.equals(other.endpointerLevelThreshold))
-			return false;
-		if (endpointerTailMargin == null) {
-			if (other.endpointerTailMargin != null)
-				return false;
-		} else if (!endpointerTailMargin.equals(other.endpointerTailMargin))
-			return false;
-		if (endpointerWaitEnd == null) {
-			if (other.endpointerWaitEnd != null)
-				return false;
-		} else if (!endpointerWaitEnd.equals(other.endpointerWaitEnd))
-			return false;
-		if (noInputTimeout == null) {
-			if (other.noInputTimeout != null)
-				return false;
-		} else if (!noInputTimeout.equals(other.noInputTimeout))
-			return false;
-		if (noInputTimeoutEnabled == null) {
-			if (other.noInputTimeoutEnabled != null)
-				return false;
-		} else if (!noInputTimeoutEnabled.equals(other.noInputTimeoutEnabled))
-			return false;
-		if (recognitionTimeout == null) {
-			if (other.recognitionTimeout != null)
-				return false;
-		} else if (!recognitionTimeout.equals(other.recognitionTimeout))
-			return false;
-		if (recognitionTimeoutEnabled == null) {
-			if (other.recognitionTimeoutEnabled != null)
-				return false;
-		} else if (!recognitionTimeoutEnabled.equals(other.recognitionTimeoutEnabled))
-			return false;
-		return true;
+		return other.getParameterMap().equals(this.getParameterMap());
 	}
 
 	private boolean convertToBoolean(String value) {

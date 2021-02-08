@@ -16,6 +16,7 @@
 package br.com.cpqd.asr.protocol;
 
 import java.util.HashMap;
+import br.com.cpqd.asr.protocol.RecognitionParameters.Header;
 
 /**
  * This message creates a new recognition session in the server.
@@ -25,6 +26,8 @@ public class CreateSession extends AsrMessage {
 
 	/** Client user agent identification (optional). */
 	private String userAgent;
+
+	private String loggingTag;
 
 	public CreateSession() {
 		setmType(AsrMessageType.CREATE_SESSION);
@@ -50,6 +53,8 @@ public class CreateSession extends AsrMessage {
 			try {
 				if ("User-Agent".toLowerCase().equals(header)) {
 					this.userAgent = headers.get(header);
+				} else if (Header.loggingTag.getHeader().equalsIgnoreCase(header)) {
+					this.loggingTag = headers.get(header);
 				} else {
 					logger.warn("Ignoring header: {} = {}", header, headers.get(header));
 				}
@@ -64,6 +69,9 @@ public class CreateSession extends AsrMessage {
 		HashMap<String, String> map = new HashMap<String, String>();
 		if (this.userAgent != null) {
 			map.put("User-Agent", this.userAgent);
+		}
+		if (this.loggingTag != null) {
+			map.put(Header.loggingTag.getHeader(), this.loggingTag);
 		}
 
 		return map;

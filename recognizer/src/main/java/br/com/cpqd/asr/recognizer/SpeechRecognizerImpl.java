@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -34,6 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import br.com.cpqd.asr.protocol.CancelRecognition;
 import br.com.cpqd.asr.protocol.CreateSession;
+import br.com.cpqd.asr.protocol.DefineGrammarMessage;
 import br.com.cpqd.asr.protocol.LanguageModel;
 import br.com.cpqd.asr.protocol.ReleaseSession;
 import br.com.cpqd.asr.protocol.ResponseMessage;
@@ -376,7 +378,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 	@Override
 	public void onRecognitionResult(RecognitionResult result) {
 		logger.debug("[{}] Recognition result (last={}): {}", this.handle, result.isLastSpeechSegment(),
-				result.toString());
+				result);
 
 		this.lastResultTime = Instant.now();
 
@@ -413,7 +415,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 
 	@Override
 	public void onPartialRecognitionResult(PartialRecognitionResult result) {
-		logger.debug("[{}] Partial recognition result: {}", this.handle, result.toString());
+		logger.debug("[{}] Partial recognition result: {}", this.handle, result);
 	}
 
 	@Override
@@ -423,7 +425,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 			return;
 		}
 
-		logger.warn("[{}] Recognition error: {}", this.handle, error.toString());
+		logger.warn("[{}] Recognition error: {}", this.handle, error);
 
 		if (readerTask != null && readerTask.isRunning()) {
 			// o servidor nao esta mais ouvindo. Encerra o envio de audio
@@ -489,7 +491,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 			} else if (response.getResult().equals(Result.SUCCESS)) {
 				logger.trace("[{}] Session configured.", handle);
 			} else {
-				logger.error("[{}] Error configuring session parameters: {}", handle, response.getSessionStatus(),
+				logger.error("[{}] Error configuring session parameters: {} {}", handle, response.getSessionStatus(),
 						response.getErrorMessage());
 				throw new RecognitionException(RecognitionErrorCode.FAILURE, response.getErrorMessage());
 			}
@@ -499,6 +501,41 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 			throw new RecognitionException(RecognitionErrorCode.FAILURE, "Encode error", e);
 		}
 
+	}
+
+	private void defineGrammar(LanguageModel languageModel) throws IOException, RecognitionException {
+		if (languageModel == null) {
+			return;
+		}
+
+		DefineGrammarMessage message = new DefineGrammarMessage();
+		message.setHandle(this.handle);
+		message.setLanguageModel(languageModel);
+
+		if (languageModel.getContentType() != null) {
+			message.setContentType(languageModel.getContentType());
+		} else if (languageModel.getDefinition() != null) {
+			message.setContentType(DefineGrammarMessage.TEXT_PLAIN);
+		} else {
+			message.setContentType(DefineGrammarMessage.TEXT_URI_LIST);
+		}
+
+		try {
+			ResponseMessage response = client.sendMessageAndWait(message);
+			if (response == null) {
+				logger.error("[{}] Timeout defining grammar.", this.handle);
+				throw new RecognitionException(RecognitionErrorCode.FAILURE, "Operation timeout");
+			} else if (Result.SUCCESS.equals(response.getResult())) {
+				logger.debug("[{}] Grammar defined ({}).", this.handle, response.getSessionStatus());
+			} else {
+				logger.error("[{}] Error defining grammar ({}): {}", this.handle, response.getSessionStatus(),
+						response.getResult());
+				throw new RecognitionException(RecognitionErrorCode.FAILURE, response.getErrorMessage());
+			}
+		} catch (EncodeException e) {
+			logger.error("[{}] Encode error", this.handle, e);
+			throw new RecognitionException(RecognitionErrorCode.FAILURE, "Encode error", e);
+		}
 	}
 
 	/**
@@ -521,18 +558,20 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 		StartRecognition message = new StartRecognition();
 		message.setHandle(this.handle);
 
-		// define o modelo de linguagem
-		if (lmList != null) {
-			LanguageModel languageModel = new LanguageModel();
-			if (lmList.getUriList().size() > 0) {
-				languageModel.setUri(lmList.getUriList().get(0));
-			} else if (lmList.getGrammarList().size() > 0) {
-				String[] grammar = lmList.getGrammarList().get(0);
-				languageModel.setId(grammar[0]);
-				languageModel.setDefinition(grammar[1]);
+		List<String> uriList = Optional.ofNullable(lmList.getUriList()).orElse(new ArrayList<>());
+		// define multiplas gramaticas
+		if (Optional.ofNullable(lmList.getGrammarList()).isPresent()) {
+			for (String[] grammar : lmList.getGrammarList()) {
+				LanguageModel lm = new LanguageModel();
+				lm.setId(grammar[0]);
+				lm.setDefinition(grammar[1]);
+				defineGrammar(lm);
+				uriList.add("session:" + grammar[0]);
 			}
-			message.setLanguageModel(languageModel);
 		}
+
+		LanguageModel languageModel = new LanguageModel(uriList.toArray(new String[uriList.size()]));
+		message.setLanguageModel(languageModel);
 
 		// define os parametros do reconhecimento
 		if (parameters != null) {
@@ -573,7 +612,6 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 	private void sendAudio(byte[] audio, int audioLength, String contentType, boolean lastPacket) throws IOException {
 		if (!client.isOpen())
 			return;
-		// throw new IOException("Websocket session is closed");
 
 		SendAudio message = new SendAudio();
 		message.setHandle(this.handle);

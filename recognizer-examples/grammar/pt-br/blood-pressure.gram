@@ -1,0 +1,52 @@
+#ABNF 1.0 UTF-8;
+language pt-BR;
+tag-format <semantics/1.0>;
+mode voice;
+
+// ============================================================================
+// Grammar: blood-pressure.gram
+//
+// This is a grammar for "Blood pressure reading". The returned
+// interpretation is the systolic and diastolic numbers formatted as a fraction.
+// For example: "12/8 ".
+//
+// Use this grammar with CPqD ASR 2.9 ou higher.
+// Depends on: integer.gram
+//
+// Version: 1.0
+// Date: 2020-07-02
+// ============================================================================
+
+root $root;
+
+$root = $GARBAGE [$fillers] $blood_pressure $GARBAGE;
+
+$fillers =
+  [a] [minha] [pressão] [é | está] |
+  é;
+
+$blood_pressure = $high {out = rules.latest()} [$split] {out = out + "/"} $low {out = out + rules.latest()};
+
+$high = 
+  $digit {out = rules.latest() * 10} |
+  $number_10_99 {out = rules.latest() * 10} | 
+  $number_100_999 {out = rules.latest()};
+
+$low =
+  $digit {out = rules.latest() * 10} | 
+  $number_10_99 {out = rules.latest()} | 
+  $number_100_999 {out = rules.latest()};
+
+
+$digit = $<http://vmh102.cpqd.com.br:8280/asr_dist/repository/grammars/dynamic-gram/integer.gram#digit> {out = rules.latest().toString()};
+
+$number_10_99 = ($<http://vmh102.cpqd.com.br:8280/asr_dist/repository/grammars/dynamic-gram/integer.gram#number_10_19>
+              |  $<http://vmh102.cpqd.com.br:8280/asr_dist/repository/grammars/dynamic-gram/integer.gram#number_20_99>)
+                 {out = rules.latest().toString()};
+
+$number_100_999 = $<http://vmh102.cpqd.com.br:8280/asr_dist/repository/grammars/dynamic-gram/integer.gram#number_100_999>
+                  {out = rules.latest().toString()};
+
+$split = por | traço | barra | e;
+
+// ============================================================================

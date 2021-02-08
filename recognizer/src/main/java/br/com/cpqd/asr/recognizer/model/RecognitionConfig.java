@@ -137,6 +137,46 @@ public class RecognitionConfig {
 		put("decoder.confidenceThreshold", decoderConfidenceThreshold);
 	}
 
+	public String getWordHints() {
+		return getString("hints.words");
+	}
+
+	public void setWordHints(String wordHints) {
+		put("hints.words", wordHints);
+	}
+
+	public String getTextifyFormattingRules() {
+		return getString("textify.formatting.rules");
+	}
+
+	public void setTextifyFormattingRules(String textifyFormattingRules) {
+		put("textify.formatting.rules", textifyFormattingRules);
+	}
+
+	public Boolean getTextifyFormattingEnabled() {
+		return getBoolean("textify.formatting.enabled");
+	}
+
+	public void setTextifyFormattingEnabled(Boolean textifyFormattingEnabled) {
+		put("textify.formatting.enabled", textifyFormattingEnabled);
+	}
+
+	public Boolean getTextifyEnabled() {
+		return getBoolean("textify.enabled");
+	}
+
+	public void setTextifyEnabled(Boolean textifyEnabled) {
+		put("textify.enabled", textifyEnabled);
+	}
+
+	public String getLoggingTag() {
+		return getString("loggingTag");
+	}
+
+	private void setLoggingTag(String loggingTag) {
+		put("loggingTag", loggingTag);
+	}
+
 	private void put(String key, Object value) {
 		if (value != null)
 			this.map.put(key, value.toString());
@@ -150,6 +190,10 @@ public class RecognitionConfig {
 	private Integer getInteger(String key) {
 		String value = this.map.get(key);
 		return (value == null ? null : Integer.parseInt(value));
+	}
+
+	private String getString(String key) {
+		return this.map.get(key);
 	}
 
 	public HashMap<String, String> getParameterMap() {
@@ -203,6 +247,11 @@ public class RecognitionConfig {
 		private Integer endPointerAutoLevelLen;
 		private Integer endPointerLevelMode;
 		private Integer endPointerLevelThreshold;
+		private String wordHints;
+		private Boolean textifyEnabled;
+		private Boolean textifyFormattingEnabled;
+		private String textifyFormattingRules;
+		private String loggingTag;
 
 		/**
 		 * Creates a new instance of the RecognitionConfig object.
@@ -225,6 +274,11 @@ public class RecognitionConfig {
 			config.setEndpointerLevelThreshold(endPointerLevelThreshold);
 			config.setNoInputTimeoutEnabled(noInputTimeoutEnabled);
 			config.setRecognitionTimeoutEnabled(recognitionTimeoutEnabled);
+			config.setWordHints(wordHints);
+			config.setTextifyEnabled(textifyEnabled);
+			config.setTextifyFormattingEnabled(textifyFormattingEnabled);
+			config.setTextifyFormattingRules(textifyFormattingRules);
+			config.setLoggingTag(loggingTag);
 
 			return config;
 		}
@@ -296,6 +350,31 @@ public class RecognitionConfig {
 
 		public RecognitionConfig.Builder recognitionTimeoutEnabled(Boolean value) {
 			this.recognitionTimeoutEnabled = value;
+			return this;
+		}
+
+		public RecognitionConfig.Builder textifyEnabled(Boolean textifyEnabled) {
+			this.textifyEnabled = textifyEnabled;
+			return this;
+		}
+
+		public RecognitionConfig.Builder textifyFormattingEnabled(Boolean textifyFormattingEnabled) {
+			this.textifyFormattingEnabled = textifyFormattingEnabled;
+			return this;
+		}
+
+		public RecognitionConfig.Builder textifyFormattingRules(String textifyFormattingRules) {
+			this.textifyFormattingRules = textifyFormattingRules;
+			return this;
+		}
+
+		public RecognitionConfig.Builder wordHints(String wordHints) {
+			this.wordHints = wordHints;
+			return this;
+		}
+
+		public RecognitionConfig.Builder loggingTag(String value) {
+			this.loggingTag = value;
 			return this;
 		}
 	}
