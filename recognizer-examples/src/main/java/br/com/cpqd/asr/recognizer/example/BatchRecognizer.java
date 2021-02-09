@@ -175,8 +175,8 @@ public class BatchRecognizer {
 
 	private static String hints(String hints) throws IOException {
 		// word hints
-		if (hints != null && hints.startsWith("@"))
-			return Files.readString(Paths.get(hints.substring(1)), StandardCharsets.UTF_8);
+		if (hints != null && hints.startsWith("@"))			
+			return new String(Files.readAllBytes(Paths.get(hints.substring(1))), StandardCharsets.UTF_8);
 		return hints;
 	}
 
@@ -185,7 +185,7 @@ public class BatchRecognizer {
 		for (String lmPath : lm.split(",")) {
 			if (lmPath.startsWith("@")) {
 				// gramatica inline (ler conteúdo do arquivo indicado no path)
-				String grammarBody = new String(Files.readAllBytes(Paths.get(lmPath.substring(1))));
+				String grammarBody = new String(Files.readAllBytes(Paths.get(lmPath.substring(1))), StandardCharsets.UTF_8);
 				String grammarName = lmPath.substring(lmPath.lastIndexOf("/")).replace(".", "_").replace("/", "_");
 				System.out.println("[" + lmPath + "] Grammar name: " + grammarName);
 				lmBuilder.addInlineGrammar(grammarName, grammarBody);
