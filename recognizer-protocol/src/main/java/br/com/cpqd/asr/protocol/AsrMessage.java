@@ -49,7 +49,7 @@ public abstract class AsrMessage {
 		START_INPUT_TIMERS, SET_PARAMETERS, GET_PARAMETERS, DEFINE_GRAMMAR, START_OF_SPEECH,
 		END_OF_SPEECH, RECOGNITION_RESULT, INTERPRET_TEXT, RESPONSE
 
-	};
+	}
 
 	/** Defines the message type. */
 	private AsrMessageType mType;
@@ -65,6 +65,9 @@ public abstract class AsrMessage {
 
 	/** The message body content-type. */
 	private String contentType;
+
+	/** The message protocol version. */
+	private String protocolVersion;
 
 	public AsrMessageType getmType() {
 		return mType;
@@ -104,6 +107,14 @@ public abstract class AsrMessage {
 
 	public void setContentType(String contentType) {
 		this.contentType = contentType;
+	}
+
+	public String getProtocolVersion() {
+		return protocolVersion;
+	}
+
+	public void setProtocolVersion(String protocolVersion) {
+		this.protocolVersion = protocolVersion;
 	}
 
 	@Override
@@ -152,7 +163,7 @@ public abstract class AsrMessage {
 	 * @throws DecodeException
 	 *             em caso de erro de decodificação.
 	 */
-	public static AsrMessage createMessage(AsrMessageType type, HashMap<String, String> headers, byte[] content)
+	public static AsrMessage createMessage(AsrMessageType type, String version, HashMap<String, String> headers, byte[] content)
 			throws DecodeException {
 		AsrMessage message = null;
 
@@ -203,8 +214,10 @@ public abstract class AsrMessage {
 			break;
 		}
 
-		if (message != null)
+		if (message != null) {
 			message.populate(headers, content);
+			message.setProtocolVersion(version);
+		}
 		return message;
 	}
 

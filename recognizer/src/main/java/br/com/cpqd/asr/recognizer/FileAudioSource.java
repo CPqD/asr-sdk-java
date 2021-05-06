@@ -41,7 +41,7 @@ public class FileAudioSource implements AudioSource {
 	 * Creates a new instance.
 	 *
 	 * @param file
-	 *            the file.
+	 *            the file (in WAV format).
 	 * @throws IOException
 	 *             if an I/O error occurs.
 	 */
@@ -53,8 +53,19 @@ public class FileAudioSource implements AudioSource {
 	 * Creates a new instance.
 	 *
 	 * @param file File to be read
+	 * @param contentType The audio format.
+	 *
+	 * @throws IOException
+	 */
+	public FileAudioSource(File file, String contentType) throws IOException {
+		this(file, false, contentType);
+	}
+	/**
+	 * Creates a new instance.
+	 *
+	 * @param file File to be read
 	 * @param decodeAudio 'true' if audio must be converted to RAW before sending.
-	 * @param contentType The output audio format (after decoding).
+	 * @param contentType The output audio format (if decodeAudio = 'false', not converted).
 	 *
 	 * @throws IOException
 	 */

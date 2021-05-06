@@ -137,6 +137,14 @@ public class RecognitionConfig {
 		put("decoder.confidenceThreshold", decoderConfidenceThreshold);
 	}
 
+	public Integer getWordDetails() {
+		return getInteger("decoder.wordDetails");
+	}
+
+	public void setWordDetails(Integer wordDetails) {
+		put("decoder.wordDetails", wordDetails);
+	}
+
 	public String getWordHints() {
 		return getString("hints.words");
 	}
@@ -175,6 +183,30 @@ public class RecognitionConfig {
 
 	private void setLoggingTag(String loggingTag) {
 		put("loggingTag", loggingTag);
+	}
+
+	public Boolean getInferAgeEnabled() {
+		return getBoolean("Infer-age-enabled");
+	}
+
+	public void setInferAgeEnabled(Boolean inferAgeEnabled) {
+		put("Infer-age-enabled", inferAgeEnabled);
+	}
+
+	public Boolean getInferEmotionEnabled() {
+		return getBoolean("Infer-emotion-enabled");
+	}
+
+	public void setInferEmotionEnabled(Boolean inferEmotionEnabled) {
+		put("Infer-emotion-enabled", inferEmotionEnabled);
+	}
+
+	public Boolean getInferGenderEnabled() {
+		return getBoolean("Infer-gender-enabled");
+	}
+
+	public void setInferGenderEnabled(Boolean inferGenderEnabled) {
+		put("Infer-gender-enabled", inferGenderEnabled);
 	}
 
 	private void put(String key, Object value) {
@@ -247,11 +279,17 @@ public class RecognitionConfig {
 		private Integer endPointerAutoLevelLen;
 		private Integer endPointerLevelMode;
 		private Integer endPointerLevelThreshold;
+		private Integer wordDetails;
 		private String wordHints;
 		private Boolean textifyEnabled;
 		private Boolean textifyFormattingEnabled;
 		private String textifyFormattingRules;
 		private String loggingTag;
+
+		// speech server
+		private Boolean inferAgeEnabled;
+		private Boolean inferEmotionEnabled;
+		private Boolean inferGenderEnabled;
 
 		/**
 		 * Creates a new instance of the RecognitionConfig object.
@@ -274,11 +312,16 @@ public class RecognitionConfig {
 			config.setEndpointerLevelThreshold(endPointerLevelThreshold);
 			config.setNoInputTimeoutEnabled(noInputTimeoutEnabled);
 			config.setRecognitionTimeoutEnabled(recognitionTimeoutEnabled);
+			config.setWordDetails(wordDetails);
 			config.setWordHints(wordHints);
 			config.setTextifyEnabled(textifyEnabled);
 			config.setTextifyFormattingEnabled(textifyFormattingEnabled);
 			config.setTextifyFormattingRules(textifyFormattingRules);
 			config.setLoggingTag(loggingTag);
+
+			config.setInferAgeEnabled(inferAgeEnabled);
+			config.setInferEmotionEnabled(inferEmotionEnabled);
+			config.setInferGenderEnabled(inferGenderEnabled);
 
 			return config;
 		}
@@ -367,6 +410,10 @@ public class RecognitionConfig {
 			this.textifyFormattingRules = textifyFormattingRules;
 			return this;
 		}
+		public RecognitionConfig.Builder wordDetails(int wordDetails) {
+			this.wordDetails = wordDetails;
+			return this;
+		}
 
 		public RecognitionConfig.Builder wordHints(String wordHints) {
 			this.wordHints = wordHints;
@@ -375,6 +422,21 @@ public class RecognitionConfig {
 
 		public RecognitionConfig.Builder loggingTag(String value) {
 			this.loggingTag = value;
+			return this;
+		}
+
+		public RecognitionConfig.Builder inferAgeEnabled(Boolean value) {
+			this.inferAgeEnabled = value;
+			return this;
+		}
+
+		public RecognitionConfig.Builder inferEmotionEnabled(Boolean value) {
+			this.inferEmotionEnabled = value;
+			return this;
+		}
+
+		public RecognitionConfig.Builder inferGenderEnabled(Boolean value) {
+			this.inferGenderEnabled = value;
 			return this;
 		}
 	}

@@ -16,8 +16,11 @@
 package br.com.cpqd.asr.protocol;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
@@ -51,6 +54,14 @@ public class RecognitionResult {
 	@JacksonXmlElementWrapper(localName = "alternatives")
 	@JacksonXmlProperty(localName = "alternative")
 	private List<RecognitionAlternative> alternatives = new ArrayList<>();
+
+	// Speech Server
+	@JsonProperty("age_scores") @JsonInclude(NON_NULL)
+	private HashMap<String, Object> ageScores;
+	@JsonProperty("emotion_scores") @JsonInclude(NON_NULL)
+	private HashMap<String, Object> emotionScores;
+	@JsonProperty("gender_scores") @JsonInclude(NON_NULL)
+	private HashMap<String, Object> genderScores;
 
 	public boolean isLastSegment() {
 		return lastSegment;
@@ -110,6 +121,30 @@ public class RecognitionResult {
 
 	public void setRecognitionStatus(RecognitionStatus status) {
 		this.recognitionStatus = status;
+	}
+
+	public HashMap<String, Object> getAgeScores() {
+		return ageScores;
+	}
+
+	public void setAgeScores(HashMap<String, Object> ageScores) {
+		this.ageScores = ageScores;
+	}
+
+	public HashMap<String, Object> getEmotionScores() {
+		return emotionScores;
+	}
+
+	public void setEmotionScores(HashMap<String, Object> emotionScores) {
+		this.emotionScores = emotionScores;
+	}
+
+	public HashMap<String, Object> getGenderScores() {
+		return genderScores;
+	}
+
+	public void setGenderScores(HashMap<String, Object> genderScores) {
+		this.genderScores = genderScores;
 	}
 
 	@Override

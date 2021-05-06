@@ -42,7 +42,10 @@ public class StartRecognition extends AsrMessage {
 	private String accept;
 
 	/** Additional headers containing the recognition parameters. */
-	private HashMap<String, String> parameters = new LinkedHashMap<String, String>();
+	private HashMap<String, String> parameters = new LinkedHashMap<>();
+
+	private String mediaType;
+	private Boolean verifyBuffer;
 
 	public StartRecognition() {
 		super();
@@ -64,6 +67,22 @@ public class StartRecognition extends AsrMessage {
 
 	public void setAccept(String contentType) {
 		this.accept = contentType;
+	}
+
+	public String getMediaType() {
+		return mediaType;
+	}
+
+	public void setMediaType(String mediaType) {
+		this.mediaType = mediaType;
+	}
+
+	public Boolean getVerifyBuffer() {
+		return verifyBuffer;
+	}
+
+	public void setVerifyBuffer(Boolean verifyBuffer) {
+		this.verifyBuffer = verifyBuffer;
 	}
 
 	/**
@@ -112,6 +131,10 @@ public class StartRecognition extends AsrMessage {
 					this.accept = headers.get(header);
 				} else if ("content-id".equals(header)) {
 					this.lm.setId(headers.get(header));
+				} else if ("Media-Type".equalsIgnoreCase(header)) {
+					this.mediaType = headers.get(header);
+				} else if ("Verify-Buffer-Utterance".equalsIgnoreCase(header)) {
+					this.verifyBuffer = Boolean.getBoolean(headers.get(header));
 				} else {
 					// verifica se o header é um parametro de reconhecimento valido
 					Header h = Header.fromHeader(header);
@@ -142,7 +165,7 @@ public class StartRecognition extends AsrMessage {
 
 			if (getContentType().equals(TEXT_URI_LIST)) {
 				// modelo ligua definido como lista URI
-				ArrayList<String> uriList = new ArrayList<String>();
+				ArrayList<String> uriList = new ArrayList<>();
 				String[] uris = new String(content).split("\\r?\\n");
 				for (int i = 0; i < uris.length; i++) {
 					String str = uris[i].trim();
@@ -174,20 +197,23 @@ public class StartRecognition extends AsrMessage {
 
 	@Override
 	public HashMap<String, String> getHeaders() {
-		HashMap<String, String> map = new HashMap<String, String>();
+		HashMap<String, String> map = new HashMap<>();
 		if (this.lm.getId() != null) {
 			map.put("Content-ID", this.lm.getId());
 		}
-
 		if (this.accept != null) {
 			map.put("Accept", this.accept);
 		}
-
+		if (this.mediaType != null) {
+			map.put("Media-Type", this.mediaType);
+		}
+		if (this.verifyBuffer != null) {
+			map.put("Verify-Buffer-Utterance", this.verifyBuffer.toString());
+		}
 		// adiciona header extras (parametros para o reconhecimento)
 		for (String key : parameters.keySet()) {
 			map.put(key, parameters.get(key));
 		}
-
 		return map;
 	}
 

@@ -29,6 +29,9 @@ public class CreateSession extends AsrMessage {
 
 	private String loggingTag;
 
+	/** Identifier for sharing resources through different sessions. (speech server optional)*/
+	private String channelIdentifier;
+
 	public CreateSession() {
 		setmType(AsrMessageType.CREATE_SESSION);
 	}
@@ -41,6 +44,22 @@ public class CreateSession extends AsrMessage {
 		this.userAgent = userAgent;
 	}
 
+	public String getLoggingTag() {
+		return loggingTag;
+	}
+
+	public void setLoggingTag(String loggingTag) {
+		this.loggingTag = loggingTag;
+	}
+
+	public String getChannelIdentifier() {
+		return channelIdentifier;
+	}
+
+	public void setChannelIdentifier(String channelIdentifier) {
+		this.channelIdentifier = channelIdentifier;
+	}
+
 	@Override
 	public String toString() {
 		return "CreateSession [userAgent=" + userAgent + "]";
@@ -51,8 +70,10 @@ public class CreateSession extends AsrMessage {
 
 		for (String header : headers.keySet()) {
 			try {
-				if ("User-Agent".toLowerCase().equals(header)) {
+				if ("User-Agent".equalsIgnoreCase(header)) {
 					this.userAgent = headers.get(header);
+				} else if ("Channel-Identifier".equalsIgnoreCase(header)) {
+					this.channelIdentifier = headers.get(header);
 				} else if (Header.loggingTag.getHeader().equalsIgnoreCase(header)) {
 					this.loggingTag = headers.get(header);
 				} else {
@@ -66,14 +87,16 @@ public class CreateSession extends AsrMessage {
 
 	@Override
 	public HashMap<String, String> getHeaders() {
-		HashMap<String, String> map = new HashMap<String, String>();
+		HashMap<String, String> map = new HashMap<>();
 		if (this.userAgent != null) {
 			map.put("User-Agent", this.userAgent);
 		}
 		if (this.loggingTag != null) {
 			map.put(Header.loggingTag.getHeader(), this.loggingTag);
 		}
-
+		if (this.channelIdentifier != null) {
+			map.put("Channel-Identifier", this.channelIdentifier);
+		}
 		return map;
 	}
 
