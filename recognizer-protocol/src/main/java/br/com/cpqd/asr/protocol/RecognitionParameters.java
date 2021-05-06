@@ -63,7 +63,12 @@ public class RecognitionParameters {
 		textifyEnabled("textify.enabled"),
 		textifyFormattingEnabled("textify.formatting.enabled"),
 		textifyFormattingRules("textify.formatting.rules"),
-		loggingTag("loggingTag");
+		loggingTag("loggingTag"),
+
+		// versao 2.4 - speech server
+		inferAgeEnabled("Infer-age-enabled"),
+		inferEmotionEnabled("Infer-emotion-enabled"),
+		inferGenderEnabled("Infer-gender-enabled");
 
 		/** valor do header na comunicação websocket. */
 		private String headerName;
@@ -120,6 +125,10 @@ public class RecognitionParameters {
 	private String textifyFormattingRules;
 	private String loggingTag;
 
+	private Boolean inferAgeEnabled;
+	private Boolean inferEmotionEnabled;
+	private Boolean inferGenderEnabled;
+
 	/**
 	 * Obtém uma lista de todos os parametros de configuração.
 	 * 
@@ -156,7 +165,7 @@ public class RecognitionParameters {
 				String param = m.getName().substring(3, 4).toLowerCase() + m.getName().substring(4);
 				// obtem o parametro equivalente, a partir do atributo da classe
 				// RecognitionParameters
-				Header h = Header.valueOf(param);
+				Header h = Header.fromHeader(param);
 				if (h == null) {
 					logger.warn("Parameter not mapped in Header enum: {}", param);
 					continue;
@@ -394,6 +403,30 @@ public class RecognitionParameters {
 
 	public void setLoggingTag(String loggingTag) {
 		this.loggingTag = loggingTag;
+	}
+
+	public Boolean getInferAgeEnabled() {
+		return inferAgeEnabled;
+	}
+
+	public void setInferAgeEnabled(Boolean inferAgeEnabled) {
+		this.inferAgeEnabled = inferAgeEnabled;
+	}
+
+	public Boolean getInferEmotionEnabled() {
+		return inferEmotionEnabled;
+	}
+
+	public void setInferEmotionEnabled(Boolean inferEmotionEnabled) {
+		this.inferEmotionEnabled = inferEmotionEnabled;
+	}
+
+	public Boolean getInferGenderEnabled() {
+		return inferGenderEnabled;
+	}
+
+	public void setInferGenderEnabled(Boolean inferGenderEnabled) {
+		this.inferGenderEnabled = inferGenderEnabled;
 	}
 
 	@Override

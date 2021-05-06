@@ -4,5 +4,6 @@
 .settings
 .classpath
 .orig
+*.iml
 */dependency-reduced-pom.xml
 .*

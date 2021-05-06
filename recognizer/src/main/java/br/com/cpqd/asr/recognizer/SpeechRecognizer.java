@@ -162,6 +162,12 @@ public interface SpeechRecognizer {
 		/** The maximum time the ASR session is kept open and idle. */
 		protected int maxSessionIdleSeconds;
 
+		/** The API protocol version. */
+		protected String protocolVersion;
+
+		/** The channel identifier for the ASR Resource. */
+		protected String channelIdentifier;
+
 		/**
 		 * Private constructor. Defines default configuration parameters.
 		 *
@@ -308,6 +314,15 @@ public interface SpeechRecognizer {
 			return this;
 		}
 
-	}
+        public SpeechRecognizer.Builder version(String protocolVersion) {
+			this.protocolVersion = protocolVersion;
+			return this;
+        }
+
+		public SpeechRecognizer.Builder channelIdentifier(String channelIdentifier) {
+			this.channelIdentifier = channelIdentifier;
+			return this;
+		}
+    }
 
 }

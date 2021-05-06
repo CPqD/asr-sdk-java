@@ -20,8 +20,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Optional;
 
 import javax.websocket.DecodeException;
 import javax.websocket.Decoder;
@@ -33,6 +35,8 @@ import org.slf4j.LoggerFactory;
 
 import br.com.cpqd.asr.protocol.AsrMessage;
 import br.com.cpqd.asr.protocol.AsrMessage.AsrMessageType;
+
+import static br.com.cpqd.asr.protocol.AsrMessage.AsrMessageType.SEND_AUDIO;
 
 /**
  * ASR Server WebSocket Messages Encoder.
@@ -46,7 +50,7 @@ public class AsrProtocolEncoder implements Encoder.BinaryStream<AsrMessage>, Dec
 	private static final String PROTOCOL_MAJOR_VERSION = "2";
 	private static final String PROTOCOL_MINOR_VERSION = "3";
 
-	public static final Charset UTF_8 = Charset.forName("UTF-8");
+	public static final Charset UTF_8 = StandardCharsets.UTF_8;
 	private static final byte[] b = { 13, 10 };
 	private static final String CRLF = new String(b);
 
@@ -105,7 +109,7 @@ public class AsrProtocolEncoder implements Encoder.BinaryStream<AsrMessage>, Dec
 				stb.delete(0, line.length());
 
 				String[] header = line.split(":", 2); // evita quebra da mensagem se valor possuir ':'
-				if (header != null && header.length > 1) {
+				if (header.length > 1) {
 					if (header[0].toLowerCase().equals("content-length")) {
 						// armazena o content-length
 						contentLength = Integer.parseInt(header[1].trim());
@@ -145,7 +149,7 @@ public class AsrProtocolEncoder implements Encoder.BinaryStream<AsrMessage>, Dec
 		}
 
 		// monta a mensagem com header e conteudo
-		AsrMessage message = AsrMessage.createMessage(messageType, headerMap, content);
+		AsrMessage message = AsrMessage.createMessage(messageType, firstLine[1].trim(), headerMap, content);
 		if (message == null) {
 			throw new DecodeException(messageType.toString(), "Invalid message type");
 		}
@@ -156,8 +160,9 @@ public class AsrProtocolEncoder implements Encoder.BinaryStream<AsrMessage>, Dec
 	public void encode(AsrMessage message, OutputStream os) throws IOException {
 
 		// primeira linha do protocolo
-		String protocol = new String(PROTOCOL_NAME + " " + PROTOCOL_MAJOR_VERSION + "." + PROTOCOL_MINOR_VERSION + " "
-				+ message.getmType() + CRLF);
+		String protocol = new String(PROTOCOL_NAME + " " +
+				Optional.ofNullable(message.getProtocolVersion()).orElse(PROTOCOL_MAJOR_VERSION + "." + PROTOCOL_MINOR_VERSION) +
+				" " + message.getmType() + CRLF);
 
 		// headers
 		HashMap<String, String> map = message.getHeaders();
@@ -186,6 +191,11 @@ public class AsrProtocolEncoder implements Encoder.BinaryStream<AsrMessage>, Dec
 			os.flush();
 		} finally {
 			os.close();
+		}
+		if (logger.isDebugEnabled()) {
+			logger.debug("Message sent: " + protocol +
+					(message.getmType() != SEND_AUDIO && message.getContent() != null ?
+							new String(message.getContent()) : ""));
 		}
 	}
 
@@ -260,7 +270,7 @@ public class AsrProtocolEncoder implements Encoder.BinaryStream<AsrMessage>, Dec
 
 			String[] firstLine = line.toString().split(" ");
 			// verifica se é mensagem de audio
-			if (!AsrMessageType.valueOf(firstLine[2].toUpperCase()).equals(AsrMessageType.SEND_AUDIO)) {
+			if (!AsrMessageType.valueOf(firstLine[2].toUpperCase()).equals(SEND_AUDIO)) {
 				// se nao é audio, copia o buffer todo para o log
 				logmessage.append(new String(buf));
 			} else {

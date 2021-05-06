@@ -21,20 +21,29 @@ package br.com.cpqd.asr.protocol;
  */
 public enum WordDetail {
 
-	ALL, FIRST, NONE;
+	ALL(2), FIRST(1), NONE(0);
 
-	public static WordDetail fromString(String str) {
+	private final int value;
+
+	WordDetail(int value) {
+		this.value = value;
+	}
+
+	public int getValue() {
+		return this.value;
+	}
+
+	public static WordDetail from(String str) {
 		if (str == null) {
 			return null;
-		} else if (str.toLowerCase().equals("all")) {
+		} else if ("2".equalsIgnoreCase(str)) {
 			return ALL;
-		} else if (str.toLowerCase().equals("first")) {
+		} else if ("1".equalsIgnoreCase(str)) {
 			return FIRST;
-		} else if (str.toLowerCase().equals("none")) {
+		} else if ("0".equalsIgnoreCase(str)) {
 			return NONE;
 		} else {
 			return null;
 		}
 	}
-	
 }
