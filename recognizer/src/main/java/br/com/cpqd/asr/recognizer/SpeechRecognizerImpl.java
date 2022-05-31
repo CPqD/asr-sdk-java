@@ -107,7 +107,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 
 		client = new AsrClientEndpoint(builder.uri, builder.username, builder.password);
 		client.getListeners().add(this);
-		if (builder.listeners.size() > 0)
+		if (!builder.listeners.isEmpty())
 			client.getListeners().addAll(builder.listeners);
 		client.setSessionTimeoutTime(builder.maxSessionIdleSeconds >= 0 ? builder.maxSessionIdleSeconds * 1000 : -1);
 
@@ -141,6 +141,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 
 		CancelRecognition message = new CancelRecognition();
 		message.setHandle(this.handle);
+		message.setProtocolVersion(builder.protocolVersion);
 		try {
 			ResponseMessage response = client.sendMessageAndWait(message);
 
@@ -192,6 +193,9 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 
 			CreateSession message = new CreateSession();
 			message.setUserAgent(this.builder.userAgent);
+			Optional.ofNullable(builder.recogConfig).ifPresent(c -> message.setLoggingTag(c.getLoggingTag()));
+			message.setProtocolVersion(builder.protocolVersion);
+			message.setChannelIdentifier(builder.channelIdentifier);
 
 			try {
 				ResponseMessage response = client.sendMessageAndWait(message);
@@ -210,9 +214,8 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 					}
 
 				} else {
-					logger.error("Error creating session ({}): {}",
-							(response != null ? response.getSessionStatus() : null),
-							(response != null ? response.getErrorMessage() : null));
+                    logger.error("Error creating session ({}): {}", response.getSessionStatus(),
+                            response.getErrorMessage());
 					handle = null;
 					throw new RecognitionException(RecognitionErrorCode.FAILURE, response.getErrorMessage());
 				}
@@ -242,7 +245,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 
 		ReleaseSession message = new ReleaseSession();
 		message.setHandle(this.handle);
-
+		message.setProtocolVersion(builder.protocolVersion);
 		try {
 			ResponseMessage response = client.sendMessageAndWait(message);
 			if (response == null) {
@@ -292,7 +295,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 		// cria uma thread para ler o audio source e enviar os pacotes para o servidor
 		readerTask = new ReaderTask(audio);
 
-		startRecognition(lm, recogConfig);
+		startRecognition(lm, recogConfig, audio.getContentType());
 	}
 
 	@Override
@@ -481,6 +484,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 
 		SetParametersMessage message = new SetParametersMessage();
 		message.setHandle(this.handle);
+		message.setProtocolVersion(builder.protocolVersion);
 		message.setRecognitionParameters(parameters.getParameterMap());
 
 		try {
@@ -510,6 +514,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 
 		DefineGrammarMessage message = new DefineGrammarMessage();
 		message.setHandle(this.handle);
+		message.setProtocolVersion(builder.protocolVersion);
 		message.setLanguageModel(languageModel);
 
 		if (languageModel.getContentType() != null) {
@@ -545,18 +550,23 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 	 *            the language model list.
 	 * @param parameters
 	 *            the recognition parameters.
+	 * @param mediaType
 	 * @return true if the server is listening
 	 * @throws IOException
 	 *             in case an I/O error occurs.
 	 * @throws RecognitionException
 	 *             some error in the recogniton process.
 	 */
-	private boolean startRecognition(LanguageModelList lmList, RecognitionConfig parameters)
+	private boolean startRecognition(LanguageModelList lmList, RecognitionConfig parameters, String mediaType)
 			throws IOException, RecognitionException {
 
 		this.lastResultTime = Instant.now();
 		StartRecognition message = new StartRecognition();
 		message.setHandle(this.handle);
+		message.setProtocolVersion(builder.protocolVersion);
+		if (mediaType != null) {
+			message.setMediaType(mediaType);
+		}
 
 		List<String> uriList = Optional.ofNullable(lmList.getUriList()).orElse(new ArrayList<>());
 		// define multiplas gramaticas
