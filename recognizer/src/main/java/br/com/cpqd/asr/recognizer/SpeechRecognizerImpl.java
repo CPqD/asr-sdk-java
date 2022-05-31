@@ -107,7 +107,7 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 
 		client = new AsrClientEndpoint(builder.uri, builder.username, builder.password);
 		client.getListeners().add(this);
-		if (builder.listeners.size() > 0)
+		if (!builder.listeners.isEmpty())
 			client.getListeners().addAll(builder.listeners);
 		client.setSessionTimeoutTime(builder.maxSessionIdleSeconds >= 0 ? builder.maxSessionIdleSeconds * 1000 : -1);
 
@@ -214,9 +214,8 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 					}
 
 				} else {
-					logger.error("Error creating session ({}): {}",
-							(response != null ? response.getSessionStatus() : null),
-							(response != null ? response.getErrorMessage() : null));
+                    logger.error("Error creating session ({}): {}", response.getSessionStatus(),
+                            response.getErrorMessage());
 					handle = null;
 					throw new RecognitionException(RecognitionErrorCode.FAILURE, response.getErrorMessage());
 				}

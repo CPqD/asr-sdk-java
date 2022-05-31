@@ -64,7 +64,7 @@ public class RecognitionParameters {
 		textifyFormattingEnabled("textify.formatting.enabled"),
 		textifyFormattingRules("textify.formatting.rules"),
 		loggingTag("loggingTag"),
-
+		accountTag("license.manager.accountTag"),
 		// versao 2.4 - speech server
 		inferAgeEnabled("Infer-age-enabled"),
 		inferEmotionEnabled("Infer-emotion-enabled"),
@@ -124,6 +124,7 @@ public class RecognitionParameters {
 	private Boolean textifyFormattingEnabled;
 	private String textifyFormattingRules;
 	private String loggingTag;
+	private String accountTag;
 
 	private Boolean inferAgeEnabled;
 	private Boolean inferEmotionEnabled;
@@ -404,6 +405,14 @@ public class RecognitionParameters {
 	public void setLoggingTag(String loggingTag) {
 		this.loggingTag = loggingTag;
 	}
+
+    public String getAccountTag() {
+        return accountTag;
+    }
+
+    public void setAccountTag(String accountTag) {
+        this.accountTag = accountTag;
+    }
 
 	public Boolean getInferAgeEnabled() {
 		return inferAgeEnabled;
