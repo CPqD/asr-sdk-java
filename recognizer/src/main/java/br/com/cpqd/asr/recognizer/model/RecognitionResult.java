@@ -17,6 +17,7 @@ package br.com.cpqd.asr.recognizer.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import br.com.cpqd.asr.recognizer.model.classifier.ClassifierResult;
 
 /**
  * Represents the final result of the recognition process.
@@ -43,6 +44,7 @@ public class RecognitionResult {
 
 	/** the list of recognition result alternative sentences. */
 	private List<RecognitionAlternative> alternatives = new ArrayList<>();
+	private ClassifierResult classifierResult = new ClassifierResult();
 
 	public RecognitionResultCode getResultCode() {
 		return resultCode;
@@ -90,6 +92,14 @@ public class RecognitionResult {
 
 	public void setAlternatives(List<RecognitionAlternative> alternatives) {
 		this.alternatives = alternatives;
+	}
+
+	public ClassifierResult getClassifierResult() {
+		return classifierResult;
+	}
+
+	public void setClassifierResult(ClassifierResult classifierResult) {
+		this.classifierResult = classifierResult;
 	}
 
 	@Override
