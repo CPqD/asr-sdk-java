@@ -3,32 +3,18 @@ package br.com.cpqd.asr.recognizer.model.classifier;
 import java.util.HashMap;
 import java.util.Map;
 
-public class EmotionResult {
-    private String event = "";
-    private String emotion = "";
+public class EmotionResult extends EmotionClassResult {
     private String group = "";
     private Map<String, Double> p = new HashMap<>();
     private Map<String, Double> p_groups = new HashMap<>();
+
     public EmotionResult() {
-    }
-    public void setEvent(String event) {
-        this.event = event;
+        super();
     }
 
-    public String getEvent() {
-        return this.event;
-    }
-
-    public void setEmotion(String emotion) {
-        this.emotion = emotion;
-    }
-
-    public String getEmotion() {
-        return this.emotion;
-    }
 
     public void setGroup(String group) {
-        this.event = group;
+        this.group = group;
     }
 
     public String getGroup() {
@@ -54,6 +40,7 @@ public class EmotionResult {
     }
 
     public String toString() {
-        return "[ event=" + event + ", emotion= " + emotion + ", group= " + group + ", p=" + p + ", p_groups=" + p_groups + " ]";
+        return "[ event=" + getEvent() + ", emotion= " + getEmotion() + ", group= " + group + ", p=" + p + ", p_groups="
+                + p_groups + " ]";
     }
 }
