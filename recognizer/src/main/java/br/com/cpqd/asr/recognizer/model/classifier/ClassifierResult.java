@@ -4,7 +4,7 @@ public class ClassifierResult {
     private GenderResult genderResult;
     private AgeResult ageResult;
     private EmotionResult emotionResult;
-    private EmotionClassResult emotionClassResult;
+
 
     public void setGenderResult(GenderResult genderResult) {
         this.genderResult = genderResult;
@@ -30,14 +30,6 @@ public class ClassifierResult {
         return emotionResult;
     }
 
-    public void setEmotionClassResult(EmotionClassResult emotionClassResult) {
-        this.emotionClassResult = emotionClassResult;
-    }
-
-    public EmotionClassResult getEmotionClassEmotionResult() {
-        return emotionClassResult;
-    }
-
     @Override
     public String toString() {
         String str = "";
@@ -47,8 +39,6 @@ public class ClassifierResult {
             str += " " + emotionResult.toString();
         if (genderResult != null)
             str += " " + genderResult.toString();
-        if (emotionClassResult != null)
-            str += " " + emotionClassResult.toString();
         return str;
     }
 }
