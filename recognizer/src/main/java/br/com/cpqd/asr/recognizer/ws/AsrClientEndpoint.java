@@ -312,8 +312,6 @@ public class AsrClientEndpoint {
 		if (message instanceof RecognitionResultMessage) {
 
 			RecognitionResultMessage recogResult = (RecognitionResultMessage) message;
-			// atualiza status da sessao
-			status = recogResult.getSessionStatus();
 
 			if (recogResult.isFinalResult()) {
 				// notifica resultado final do reconhecimento (RECOGNIZED ou
@@ -386,6 +384,9 @@ public class AsrClientEndpoint {
 					}
 				}
 			}
+
+			// atualiza status da sessao
+			status = recogResult.getSessionStatus();
 
 		} else if (message instanceof ResponseMessage) {
 			ResponseMessage resp = (ResponseMessage) message;
