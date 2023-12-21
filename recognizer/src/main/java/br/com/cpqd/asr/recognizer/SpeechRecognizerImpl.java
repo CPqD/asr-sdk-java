@@ -391,15 +391,15 @@ public class SpeechRecognizerImpl implements SpeechRecognizer, RecognitionListen
 
 		// recebeu resultado final do ultimo segmento. fecha a sessao
 		if (result.isLastSpeechSegment()) {
-			synchronized (sentencesQueue) {
-				sentencesQueue.notifyAll();
-			}
-
 			// O servidor nao esta mais ouvindo. Encerra o envio de audio
 			try {
 				this.audio.finish();
 			} catch (Exception e) {
 				logger.error("[{}] Error calling finish audio.", this.handle, e);
+			}
+
+			synchronized (sentencesQueue) {
+				sentencesQueue.notifyAll();
 			}
 
 			if (builder.autoClose) {
