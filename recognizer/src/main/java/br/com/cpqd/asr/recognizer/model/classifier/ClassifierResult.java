@@ -5,9 +5,11 @@ public class ClassifierResult {
     private AgeResult ageResult;
     private EmotionResult emotionResult;
 
+
     public void setGenderResult(GenderResult genderResult) {
         this.genderResult = genderResult;
     }
+
     public GenderResult getGenderResult() {
         return genderResult;
     }
@@ -15,6 +17,7 @@ public class ClassifierResult {
     public void setAgeResult(AgeResult ageResult) {
         this.ageResult = ageResult;
     }
+
     public AgeResult getAgeResult() {
         return ageResult;
     }
@@ -22,6 +25,7 @@ public class ClassifierResult {
     public void setEmotionResult(EmotionResult emotionResult) {
         this.emotionResult = emotionResult;
     }
+
     public EmotionResult getEmotionResult() {
         return emotionResult;
     }
