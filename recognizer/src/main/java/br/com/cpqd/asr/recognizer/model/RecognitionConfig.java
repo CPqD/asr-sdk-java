@@ -225,6 +225,70 @@ public class RecognitionConfig {
         put("Infer-gender-enabled", inferGenderEnabled);
     }
 
+    public void setDiarizationEnabled(Boolean diarizationEnabled) {
+        put("diarization.enabled", diarizationEnabled);
+    }
+
+    public Boolean getDiarizationEnabled() {
+        return getBoolean("diarization.enabled");
+    }
+
+    public void setDiarizationMaxSpeakers(Integer maxSpeakers) {
+        put("diarization.maxSpeakers", maxSpeakers);
+    }
+
+    public Integer getDiarizationMaxSpeakers() {
+        return getInteger("diarization.maxSpeakers");
+    }
+
+    public void setDiarizationLatency(Float latency) {
+        put("diarization.latency", latency);
+    }
+
+    public Float getDiarizationLatency() {
+        return getFloat("diarization.latency");
+    }
+
+    public void setDiarizationTauActive(Float tauActive) {
+        put("diarization.tauActive", tauActive);
+    }
+
+    public Float getDiarizationTauActive() {
+        return getFloat("diarization.tauActive");
+    }
+
+    public void setDiarizationRhoUpdate(Float rhoUpdate) {
+        put("diarization.rhoUpdate", rhoUpdate);
+    }
+
+    public Float getDiarizationRhoUpdate() {
+        return getFloat("diarization.rhoUpdate");
+    }
+
+    public void setDiarizationDeltaNew(Float deltaNew) {
+        put("diarization.deltaNew", deltaNew);
+    }
+
+    public Float getDiarizationDeltaNew() {
+        return getFloat("diarization.deltaNew");
+    }
+
+    public void setDiarizationGamma(Float gamma) {
+        put("diarization.gamma", gamma);
+    }
+
+    public Float getDiarizationGamma() {
+        return getFloat("diarization.gamma");
+    }
+
+    public void setDiarizationBeta(Float beta) {
+        put("diarization.beta", beta);
+    }
+
+    public Float getDiarizationBeta() {
+        return getFloat("diarization.beta");
+    }
+
     private void put(String key, Object value) {
         if (value != null)
             this.map.put(key, value.toString());
@@ -238,6 +302,11 @@ public class RecognitionConfig {
     private Integer getInteger(String key) {
         String value = this.map.get(key);
         return (value == null ? null : Integer.parseInt(value));
+    }
+
+    private Float getFloat(String key) {
+        String value = this.map.get(key);
+        return (value == null ? null : Float.parseFloat(value));
     }
 
     private String getString(String key) {
@@ -309,6 +378,16 @@ public class RecognitionConfig {
         private Boolean inferEmotionEnabled;
         private Boolean inferGenderEnabled;
 
+        // Diarization parameters
+        private Boolean diarizationEnabled;
+        private Integer diarizationMaxSpeakers;
+        private Float diarizationLatency;
+        private Float diarizationTauActive;
+        private Float diarizationRhoUpdate;
+        private Float diarizationDeltaNew;
+        private Float diarizationGamma;
+        private Float diarizationBeta;
+
         /**
          * Creates a new instance of the RecognitionConfig object.
          * 
@@ -342,6 +421,8 @@ public class RecognitionConfig {
             config.setInferAgeEnabled(inferAgeEnabled);
             config.setInferEmotionEnabled(inferEmotionEnabled);
             config.setInferGenderEnabled(inferGenderEnabled);
+
+            config.setDiarizationEnabled(diarizationEnabled);
 
             return config;
         }
@@ -468,6 +549,46 @@ public class RecognitionConfig {
 
         public RecognitionConfig.Builder inferGenderEnabled(Boolean value) {
             this.inferGenderEnabled = value;
+            return this;
+        }
+
+        public RecognitionConfig.Builder diarizationEnabled(Boolean value) {
+            this.diarizationEnabled = value;
+            return this;
+        }
+
+        public RecognitionConfig.Builder diarizationMaxSpeakers(Integer value) {
+            this.diarizationMaxSpeakers = value;
+            return this;
+        }
+
+        public RecognitionConfig.Builder diarizationLatency(Float value) {
+            this.diarizationLatency = value;
+            return this;
+        }
+
+        public RecognitionConfig.Builder diarizationTauActive(Float value) {
+            this.diarizationTauActive = value;
+            return this;
+        }
+
+        public RecognitionConfig.Builder diarizationRhoUpdate(Float value) {
+            this.diarizationRhoUpdate = value;
+            return this;
+        }
+
+        public RecognitionConfig.Builder diarizationDeltaNew(Float value) {
+            this.diarizationDeltaNew = value;
+            return this;
+        }
+
+        public RecognitionConfig.Builder diarizationGamma(Float value) {
+            this.diarizationGamma = value;
+            return this;
+        }
+
+        public RecognitionConfig.Builder diarizationBeta(Float value) {
+            this.diarizationBeta = value;
             return this;
         }
     }

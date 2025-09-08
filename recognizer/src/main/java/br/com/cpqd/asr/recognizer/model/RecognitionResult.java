@@ -17,7 +17,9 @@ package br.com.cpqd.asr.recognizer.model;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import br.com.cpqd.asr.recognizer.model.classifier.ClassifierResult;
+import br.com.cpqd.asr.recognizer.model.diarization.DiarizationResult;
 
 /**
  * Represents the final result of the recognition process.
@@ -45,6 +47,7 @@ public class RecognitionResult {
 	/** the list of recognition result alternative sentences. */
 	private List<RecognitionAlternative> alternatives = new ArrayList<>();
 	private ClassifierResult classifierResult = new ClassifierResult();
+	private DiarizationResult diarizationResult = new DiarizationResult();
 
 	public RecognitionResultCode getResultCode() {
 		return resultCode;
@@ -100,6 +103,14 @@ public class RecognitionResult {
 
 	public void setClassifierResult(ClassifierResult classifierResult) {
 		this.classifierResult = classifierResult;
+	}
+	
+	public DiarizationResult getDiarizationResult() {
+		return diarizationResult;
+	}
+
+	public void setDiarizationResult(DiarizationResult diarizationResult) {
+		this.diarizationResult = diarizationResult;
 	}
 
 	@Override

@@ -326,6 +326,12 @@ public class AsrClientEndpoint {
 				aResult.setLastSpeechSegment(result.isLastSegment());
 				aResult.setSegmentEndTime(result.getEndTime());
 				aResult.setSegmentStartTime(result.getStartTime());
+				if (result.getDiarizationResult() != null) {
+					br.com.cpqd.asr.recognizer.model.diarization.DiarizationResult diarization_result = new br.com.cpqd.asr.recognizer.model.diarization.DiarizationResult();
+					diarization_result.setSpeaker(result.getDiarizationResult().get("speaker").toString());
+					diarization_result.setConfidence(Float.parseFloat(result.getDiarizationResult().get("confidence").toString()));
+					aResult.setDiarizationResult(diarization_result);
+				}
 
 				for (br.com.cpqd.asr.protocol.RecognitionAlternative s : result.getAlternatives()) {
 					RecognitionAlternative alt = new RecognitionAlternative();
