@@ -15,12 +15,15 @@
  ******************************************************************************/
 package br.com.cpqd.asr.recognizer.model;
 
+import br.com.cpqd.asr.recognizer.model.diarization.DiarizationResult;
+
 public class Word {
 
 	private float startTime;
 	private float endTime;
 	private String word;
 	private int confidence;
+	private DiarizationResult diarizationResult;
 
 	public float getStartTime() {
 		return startTime;
@@ -52,6 +55,14 @@ public class Word {
 
 	public void setConfidence(int confidence) {
 		this.confidence = confidence;
+	}
+
+	public DiarizationResult getDiarizationResult() {
+		return diarizationResult;
+	}
+
+	public void setCDiarizationResult(DiarizationResult diarizationResult) {
+		this.diarizationResult = diarizationResult;
 	}
 
 }

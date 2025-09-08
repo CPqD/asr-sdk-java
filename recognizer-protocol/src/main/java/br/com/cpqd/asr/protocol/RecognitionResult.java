@@ -63,6 +63,9 @@ public class RecognitionResult {
 	@JsonProperty("gender_scores") @JsonInclude(NON_NULL)
 	private HashMap<String, Object> genderScores;
 
+	@JsonProperty("diarization_result") @JsonInclude(NON_NULL)
+	private HashMap<String, Object> diarizationResult;
+
 	public boolean isLastSegment() {
 		return lastSegment;
 	}
@@ -145,6 +148,14 @@ public class RecognitionResult {
 
 	public void setGenderScores(HashMap<String, Object> genderScores) {
 		this.genderScores = genderScores;
+	}
+
+	public HashMap<String, Object> getDiarizationResult() {
+		return diarizationResult;
+	}
+
+	public void setDiarizationResult(HashMap<String, Object> diarizationResult) {
+		this.diarizationResult = diarizationResult;
 	}
 
 	@Override
